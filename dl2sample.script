@@ -1,0 +1,27 @@
+{
+	proxy:[
+		{	name : lo8888
+			url: "127.0.0.1:8888"
+		}
+		{	name: lo8889
+			url: "127.0.0.1:8889"
+			user: "user:pass"
+		}
+	]
+	url:[
+		[url1 "http://xxxxxx" ]
+		[url2 "http://yyyyyy" ]
+	]
+	
+	source:[ /* [ DIRECT/Proxy   source-url  header concurrent ]*/
+		[lo8888 url2 head1 2]
+		[DIRECT url1 head1 2]
+		[DIRECT url2 head1 2]
+	]
+
+	httpHeader:[
+		[ head1,{
+			"user-agent": "Mozilla/5.0 (Windows NT 5.1; rv:43.0) Gecko/20100101 Firefox/43.0"
+		}]
+	]
+}
