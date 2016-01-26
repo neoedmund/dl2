@@ -7,6 +7,7 @@
 * multi-source via multi-proxy in multi-thread
 * easy config file
 * robust and synchornized
+* support HTTP/HTTPS
 
 
 ## run
