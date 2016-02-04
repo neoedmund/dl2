@@ -15,7 +15,7 @@ public class DL2 {
 
 	static final int ps_version = 1;
 
-	static final String ver = "0.1";
+	static final String ver = "0.2";
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 ver " + ver);

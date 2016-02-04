@@ -16,13 +16,15 @@ public class Source1 {
 		t0 = t1 = System.currentTimeMillis();
 	}
 
-	public synchronized String getSpeed(long size) {
+	public String getSpeed(long size) {
+		synchronized (this) {
+			sum += size;
+		}
 		long t2 = System.currentTimeMillis();
 		long t = t2 - t1;
 		t1 = t2;
 		if (t == 0)
-			return "MAX";
-		sum += size;
+			return "MAX";		
 		return String.format("%,dKB/s avg. %,dKB/s, sum=%,dbytes", size / t, sum / (t2 - t0), sum);
 
 	}
