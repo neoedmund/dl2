@@ -20,7 +20,7 @@ public class DLAgent {
 		this.src = src;
 		this.part = p;
 		this.name = name;
-		
+
 	}
 
 	private void downloadPart(long pi) throws Exception {
@@ -28,7 +28,7 @@ public class DLAgent {
 		if (pi >= ps.blocks) {
 			throw new RuntimeException("bug detected(1)");
 		}
-		
+
 		long start = DL2.blockSize * pi;
 		long len = DL2.blockSize;
 
@@ -76,7 +76,7 @@ public class DLAgent {
 						failed++;
 						if (failed >= MAX_FAIL) {
 							live = false;
-							Log.log("[err]agent down because failed too many times" + failed);
+							Log.log(String.format("agent %s down because failed too many times %d", name, failed));
 							ps.dl2.incAgentDown(true);
 							return;
 						}
@@ -149,8 +149,7 @@ public class DLAgent {
 							np.totalLen = right;
 							np.agent = this;
 							ps.parts.add(np);
-							say(String.format("[sep][start %s,len %s,done %s, mid %s]", p.start, oldTotal, p.doneLen,
-									np.start));
+							say(String.format("[sep][start %s,len %s,done %s, mid %s]", p.start, oldTotal, p.doneLen, np.start));
 							ps.save();
 							return np;
 						}
