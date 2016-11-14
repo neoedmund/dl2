@@ -32,7 +32,7 @@ public class DLAgent {
 		long start = DL2.blockSize * pi;
 		long len = DL2.blockSize;
 
-		if (pi == ps.blocks - 1) {
+		if (ps.dl2.remain != 0 && pi == ps.blocks - 1) {
 			len = ps.dl2.remain;// ps.filesize % DL2.blockSize;
 		}
 		Downloader dl = new Downloader(name);
@@ -48,10 +48,10 @@ public class DLAgent {
 				say(String.format("[dl]drop dl part %s expected %s", pi, expect));
 				return;
 			}
-			say("[dl]OK part:" + pi + "/" + ps.blocks);
+			say("OK:" + pi + "/" + ps.blocks);
 			U.writeToFile(ps.fn, start, len, dl.ba);
 			part.incDoneLen(len);
-			ps.save();
+			ps.save(name);
 			say(src.name + "[dl]speed:" + src.getSpeed(len));
 		}
 
@@ -149,8 +149,9 @@ public class DLAgent {
 							np.totalLen = right;
 							np.agent = this;
 							ps.parts.add(np);
-							say(String.format("[sep][start %s,len %s,done %s, mid %s]", p.start, oldTotal, p.doneLen, np.start));
-							ps.save();
+							say(String.format("[sep][start %s,len %s,done %s, mid %s]", p.start, oldTotal, p.doneLen,
+									np.start));
+							ps.save(name);
 							return np;
 						}
 					}

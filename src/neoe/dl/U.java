@@ -245,7 +245,7 @@ public class U {
 						blocks, p.totalLen));
 				s1 += unitsize;
 			}
-			save();
+			save("init");
 			Log.log(String.format("alloc %s size=%,d", fn, filesize));
 			RandomAccessFile f = new RandomAccessFile(fn, "rw");
 			f.setLength(filesize);
@@ -291,7 +291,7 @@ public class U {
 
 		}
 
-		void save() throws IOException {
+		void save(String callerName) throws IOException {
 			synchronized (this) {
 				String tmpf = fnps + "." + ts36();
 				DataOutputStream out = new DataOutputStream(new FileOutputStream(tmpf));
@@ -317,8 +317,8 @@ public class U {
 					long t1 = System.currentTimeMillis() - st0;
 					if (t1 != 0)
 						speed = this.sum / t1;
-					Log.log(String.format("saved parts %d, done:%d/%d (%.1f%%) speed %,dKB/s", parts.size(), sum,
-							blocks, 100.0f * sum / blocks, speed));
+					Log.log(String.format("parts %d, done:%d/%d (%.1f%%) speed %,dKB/s by %s", parts.size(), sum,
+							blocks, 100.0f * sum / blocks, speed, callerName));
 				}
 			}
 		}
