@@ -24,7 +24,7 @@ public class DLAgent {
 	}
 
 	private void downloadPart(long pi) throws Exception {
-		say("[dl]download part:" + pi + "/" + ps.blocks);
+		// say("[dl]download part:" + pi + "/" + ps.blocks);
 		if (pi >= ps.blocks) {
 			throw new RuntimeException("bug detected(1)");
 		}
@@ -48,11 +48,10 @@ public class DLAgent {
 				say(String.format("[dl]drop dl part %s expected %s", pi, expect));
 				return;
 			}
-			say("OK:" + pi + "/" + ps.blocks);
+			// say("OK:" + pi + "/" + ps.blocks);
 			U.writeToFile(ps.fn, start, len, dl.ba);
 			part.incDoneLen(len);
-			ps.save(name);
-			say(src.name + "[dl]speed:" + src.getSpeed(len));
+			ps.save(name + " " + src.getSpeed(len));
 		}
 
 	}
@@ -72,7 +71,10 @@ public class DLAgent {
 						downloadPart(pi);
 					} catch (Exception ex) {
 						// ex.printStackTrace();
-						Log.log(name + "[dl]download exception,sleep a little time", ex);
+						if (ex instanceof DL2Exception)
+							Log.log(name + "[dl]download exception " + ex.getMessage());
+						else
+							Log.log(name + "[dl]download exception", ex);
 						failed++;
 						if (failed >= MAX_FAIL) {
 							live = false;
@@ -105,24 +107,25 @@ public class DLAgent {
 	}
 
 	private void say(String s) {
-		Log.log(String.format("[agent %s]%s", name, s));
+		Log.log(String.format("%s:%s", name, s));
 	}
 
 	private U.Part seperateOthers() throws IOException {
 		synchronized (ps) {
 			for (U.Part p : ps.parts) {
-				if (p == part)
+				if (p == part || p.isDone())
 					continue;
 
 				if (p.agent == null) {
 					p.agent = this;
-					say("[sep]take over not assigned " + p);
+					say("[sep]take over " + p);
 					return p;
 				}
 			}
 			for (U.Part p : ps.parts) {
-				if (p == part)
+				if (p == part || p.isDone())
 					continue;
+
 				if (!p.agent.live) {
 					if (p.doneLen < p.totalLen) {
 						// reassign to me because origin agent is dead

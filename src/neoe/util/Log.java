@@ -42,7 +42,7 @@ public class Log {
 			File f = new File(fn);
 			System.out.println("Log " + name + ":" + f.getAbsolutePath());
 			out = new PrintWriter(new OutputStreamWriter(new FileOutputStream(f, true), "utf8"), true);
-			time = new SimpleDateFormat("yyMMdd H:m:s:S");
+			time = new SimpleDateFormat("yyMMdd H:m:s");
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

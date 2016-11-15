@@ -30,6 +30,7 @@ public class U {
 		Map<String, String> urls = new HashMap();
 
 		public void init(Map m) {
+			Log.log("load config:" + m);
 			loadProxy((List) m.get("proxy"));
 			loadHeader((List) m.get("httpHeader"));
 			loadUrl((List) m.get("url"));
@@ -185,8 +186,14 @@ public class U {
 			}
 		}
 
+		public boolean isDone() {
+			synchronized (ps) {
+				return (doneLen >= totalLen);
+			}
+		}
+
 		public String toString() {
-			return String.format("[start %s,total %s,done %s]", start, totalLen, doneLen);
+			return String.format("[%s+%s/%s]", start, doneLen, totalLen);
 		}
 	}
 
@@ -317,8 +324,8 @@ public class U {
 					long t1 = System.currentTimeMillis() - st0;
 					if (t1 != 0)
 						speed = this.sum / t1;
-					Log.log(String.format("parts %d, done:%d/%d (%.1f%%) speed %,dKB/s by %s", parts.size(), sum,
-							blocks, 100.0f * sum / blocks, speed, callerName));
+					Log.log(String.format("parts %d %d/%d (%.1f%%) %,d KB/s by %s", parts.size(), sum, blocks,
+							100.0f * sum / blocks, speed, callerName));
 				}
 			}
 		}
@@ -456,6 +463,7 @@ public class U {
 	}
 
 	public synchronized static void writeToFile(String fn, long start, long len, byte[] ba) throws Exception {
+		// Log.log(String.format("[d]write %s,%s,%s", start, len, ba.length));
 		RandomAccessFile f = new RandomAccessFile(fn, "rw");
 		f.seek(start);
 		f.write(ba, 0, (int) len);

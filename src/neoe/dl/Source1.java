@@ -24,8 +24,8 @@ public class Source1 {
 		long t = t2 - t1;
 		t1 = t2;
 		if (t == 0)
-			return "MAX";		
-		return String.format("%,dKB/s avg. %,dKB/s, sum=%,dbytes", size / t, sum / (t2 - t0), sum);
+			return "MAX";
+		return String.format("%,d KB/s avg %,d KB/s sum %,d bytes", size / t, sum / (t2 - t0), sum);
 
 	}
 
@@ -34,7 +34,7 @@ public class Source1 {
 		long t = t2 - t0;
 		if (t == 0)
 			return "MAX";
-		return String.format("%s %,dKB/s, %,dbytes", name, sum / t, sum);
+		return String.format("%s %,dKB/s, %,d bytes", name, sum / t, sum);
 
 	}
 

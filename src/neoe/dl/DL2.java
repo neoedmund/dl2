@@ -15,10 +15,10 @@ public class DL2 {
 
 	static final int ps_version = 1;
 
-	static final String ver = "161114";
+	static final String ver = "v161115";
 
 	public static void main(String[] args) throws Exception {
-		Log.log("DL2 ver " + ver);
+		Log.log("DL2 " + ver);
 		// http://docs.oracle.com/javase/6/docs/technotes/guides/net/http-keepalive.html
 		System.setProperty("http.maxConnections", "999");
 		new DL2().run(args[0]);

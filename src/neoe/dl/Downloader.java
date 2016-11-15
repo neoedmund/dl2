@@ -81,10 +81,10 @@ public class Downloader {
 			URL u = new URL(url);
 			URLConnection conn;
 			if (useProxy) {
-				Log.log(String.format("[D]connect to %s via [%s]", url, proxy));
+				// Log.log(String.format("[D]connect via proxy", url, proxy));
 				conn = u.openConnection(proxy);
 			} else {
-				Log.log(String.format("[D]connect to %s", url));
+				// Log.log(String.format("[D]connect"));
 				conn = u.openConnection();
 			}
 			conn.setConnectTimeout(3000);
@@ -96,7 +96,8 @@ public class Downloader {
 			Exception ex1 = null;
 			try {
 				respHeader = conn.getHeaderFields();
-				Log.log(String.format("[DD %s|%s]respHeader=%s", name, reqHeader.get("Range"), respHeader));
+				// Log.log(String.format("[DD %s|%s]respHeader=%s", name,
+				// reqHeader.get("Range"), respHeader));
 				if (readContent) {
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					FileUtil.copy(conn.getInputStream(), baos);
@@ -118,18 +119,21 @@ public class Downloader {
 
 					}
 
-					Log.log(String.format("[D]downloaded %s(%d bytes)", url, ba.length));
+					// Log.log(String.format("[D]downloaded %s(%d bytes)", url,
+					// ba.length));
 				}
 			} catch (Exception ex) {
 				error = true;
 				ex1 = ex;
 			}
 			if (error) {
-				Log.log("found error:" + ex1);
+				// Log.log("found error:" + ex1);
 				String errorString = "" + ex1;
 				if (errorString.indexOf("java.io.FileNotFoundException") >= 0) {
-					Log.log("should be 404, skip");
-					return;
+					throw new DL2Exception("should be 404, skip");
+				}
+				if (errorString.indexOf("connect timed out") >= 0) {
+					throw new DL2Exception("connect timed out");
 				}
 				throw new RuntimeException("download fail via proxy:" + proxy, ex1);
 
@@ -138,6 +142,10 @@ public class Downloader {
 			}
 		}
 	}
+
+	// private void say(String s) {
+	// Log.log(name + ":" + s);
+	// }
 
 	public void savePage(String path) throws Exception {
 		if (ba == null) {
@@ -172,6 +180,12 @@ public class Downloader {
 			enc = "UTF8";
 
 		url = src.url;
+
+		// if (useProxy) {
+		// Log.log(String.format("[D]setup %s via %s", url, proxy));
+		// } else {
+		// Log.log(String.format("[D]setup %s", url));
+		// }
 	}
 
 	private void setPart(long start, long len) {
