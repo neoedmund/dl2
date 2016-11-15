@@ -140,7 +140,9 @@ public class DLAgent {
 					} else {
 						long remainLen = p.totalLen - p.doneLen;
 						if (remainLen <= 1) {
-							continue;
+							say("[sep]take over from slow agent " + p.agent.name + ":" + p);
+							p.agent = this;
+							return p;
 						} else {
 							// sep
 							long left = remainLen / 2;
