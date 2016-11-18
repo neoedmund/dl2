@@ -25,7 +25,7 @@ public class Source1 {
 		t1 = t2;
 		if (t == 0)
 			return "MAX";
-		return String.format("%,d KB/s avg %,d KB/s sum %,d bytes", size / t, sum / (t2 - t0), sum);
+		return String.format("avg %,d KB/s cur %,d KB/s", sum / (t2 - t0), size / t);
 
 	}
 
