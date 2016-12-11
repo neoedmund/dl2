@@ -349,6 +349,8 @@ public class U {
 		return (long) o;
 	}
 
+	public static final String DOWNLOADING = ".dling";
+
 	static String getFileName(String s, long filesize, DL2 dl2) {
 		String fn = null;
 		int p = s.lastIndexOf("/");
@@ -366,7 +368,9 @@ public class U {
 			fn = "dl_" + Long.toString(System.currentTimeMillis(), 36);
 			Log.log("[W]cannot get filename from url use:" + fn);
 		}
-
+		{
+			fn = fn + DOWNLOADING;
+		}
 		while (true) {
 			if (new File(fn).exists()) {
 				String fnps = U.getPsFile(fn);
@@ -409,7 +413,6 @@ public class U {
 			ts[i] = new Thread() {
 				public void run() {
 					try {
-
 						Object v = func.func(o);
 						synchronized (ret) {
 							if (v != null) {

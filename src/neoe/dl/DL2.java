@@ -15,7 +15,7 @@ public class DL2 {
 
 	static final int ps_version = 1;
 
-	static final String ver = "v161115";
+	static final String ver = "v161201";
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 " + ver);
@@ -133,6 +133,12 @@ public class DL2 {
 			Log.log(String.format("[D]program end, %s parts, done: %.1f%%", ps.parts.size(), 100.0f * done / blocks));
 			if (done == blocks) {
 				ps.deleteFile();
+				{
+					if (fn.endsWith(U.DOWNLOADING)) {
+						String fn2 = fn.substring(0, fn.length() - U.DOWNLOADING.length());
+						new File(fn).renameTo(new File(fn2));
+					}
+				}
 			}
 		}
 		long t1 = System.currentTimeMillis();
