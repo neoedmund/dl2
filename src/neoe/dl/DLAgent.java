@@ -100,7 +100,6 @@ public class DLAgent {
 			Log.log("[err]agent down:" + name, ex);
 			ps.dl2.incAgentDown(true);
 			return;
-
 		}
 		ps.dl2.incAgentDown(false);
 		say("end");

@@ -3,6 +3,8 @@ package neoe.dl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import neoe.util.FileUtil;
@@ -124,7 +126,7 @@ public class DL2 {
 			long done = ps.getDone();
 			Log.log(String.format("[D]start %s parts, done: %.1f%%", ps.parts.size(), 100.0f * done / blocks));
 		}
-		startAgents();
+		List<Thread> agentThreads = startAgents();
 		synchronized (this) {
 			this.wait();
 		}
@@ -150,24 +152,39 @@ public class DL2 {
 		for (Source1 src : conf.source) {
 			Log.log("|-" + src.getSpeed());
 		}
+		{// stop slow agents
+			int cnt = 0;
+			for (Thread at : agentThreads) {
+				if (at.isAlive()) {
+					at.interrupt();
+					cnt++;
+				}
+			}
+			if (cnt > 0) {
+				Log.log(String.format("interrupt %s slow agents", cnt));
+			}
+		}
 	}
 
-	private void startAgents() {
+	private List<Thread> startAgents() {
 		Log.log("start agents");
 		int cnt = 0;
+		List<Thread> agentThreads = new ArrayList<>();
 		for (final Source1 src : conf.source) {
 			for (int i = 0; i < src.concurrent; i++) {
 				final DLAgent agent = new DLAgent(ps, src, null, src.name + ":" + i + "/" + src.concurrent);
 				cnt++;
-				new Thread() {
+				Thread t = new Thread() {
 					public void run() {
 						agent.run();
-
 					}
-				}.start();
+				};
+				t.start();
+				agentThreads.add(t);
 			}
 		}
 		this.agentCnt = cnt;
+		return agentThreads;
 	}
 
 }
