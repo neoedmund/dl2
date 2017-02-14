@@ -6,7 +6,6 @@ import neoe.util.Log;
 
 public class DLAgent {
 	private static final boolean DONNT_SEP_SAME_SOURCE = false;
-	private static final int MAX_FAIL = 3;
 	int failed;
 	boolean live = true;
 	private String name;
@@ -76,7 +75,7 @@ public class DLAgent {
 						else
 							Log.log(name + "[dl]download exception", ex);
 						failed++;
-						if (failed >= MAX_FAIL) {
+						if (failed >= ps.dl2.conf.failCnt) {
 							live = false;
 							Log.log(String.format("agent %s down because failed too many times %d", name, failed));
 							ps.dl2.incAgentDown(true);

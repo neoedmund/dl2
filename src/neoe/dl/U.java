@@ -29,13 +29,25 @@ public class U {
 
 		Map<String, String> urls = new HashMap();
 
+		int failCnt;
+
 		public void init(Map m) {
 			Log.log("load config:" + m);
 			loadProxy((List) m.get("proxy"));
 			loadHeader((List) m.get("httpHeader"));
 			loadUrl((List) m.get("url"));
-
 			loadSource((List) m.get("source"));
+			failCnt = getInt(m.get("failcnt"), 3);
+		}
+
+		private int getInt(Object o, int def) {
+			if (o == null)
+				return def;
+			try {
+				return Integer.parseInt(o.toString());
+			} catch (Exception e) {
+				return def;
+			}
 		}
 
 		private void loadHeader(List list) {

@@ -18,6 +18,8 @@
 		[DIRECT url1 head1 2]
 		[DIRECT url2 head1 2]
 	]
+	
+	failcnt:100
 
 	httpHeader:[
 		[ head1,{
