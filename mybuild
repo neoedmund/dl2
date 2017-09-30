@@ -1,0 +1,10 @@
+{ /* neoebuild script */
+baseDir:"."
+prjs:[
+ [dl2, "." , { dep:[ /* depending projects */]  cp:[ /*classpaths*/ ] /* main:"main-class-name" */}]
+ /* other projects */
+]
+destDir:"."
+target:8
+source:8
+}

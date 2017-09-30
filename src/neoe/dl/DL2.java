@@ -15,9 +15,9 @@ public class DL2 {
 
 	static final int blockSize = 128 * 1024;
 
-	static final int ps_version = 1;
+	static final int ps_version = 2;
 
-	static final String ver = "v170214";
+	static final String ver = "9h30".toString();
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 " + ver);
@@ -29,10 +29,11 @@ public class DL2 {
 	private int agentCnt;
 	int agentDown;
 	private long blocks;
-	U.Conf conf = new U.Conf();
+	Conf conf = new Conf();
 	private long filesize;
-	private String fn;
-	U.PartSave ps = new U.PartSave(this);
+	String fn;
+	PartSave ps = new PartSave(this);
+	FileWriter fw = new FileWriter(this);
 
 	long remain;
 
@@ -40,7 +41,7 @@ public class DL2 {
 
 	private int concurrent;
 
-	private void doDownloadParts() throws IOException {
+	private void doDownloadInit() throws IOException {
 		calcSize();
 		ps.init(fn, concurrent, blocks, filesize);
 	}
@@ -114,23 +115,27 @@ public class DL2 {
 		if (resume) {
 			if (!doResumeDownloadParts()) {
 				fn = fn + "." + U.ts36();
-				doDownloadParts();
+				doDownloadInit();
 			} else {
 				Log.log("resume");
-
 			}
 		} else {
-			doDownloadParts();
+			doDownloadInit();
 		}
-		synchronized (ps) {
+		fw.ps = ps.snapshot();
+		{
 			long done = ps.getDone();
 			Log.log(String.format("[D]start %s parts, done: %.1f%%", ps.parts.size(), 100.0f * done / blocks));
 		}
+
 		List<Thread> agentThreads = startAgents();
 		synchronized (this) {
 			this.wait();
 		}
-		synchronized (ps) {
+		
+		{
+			fw.flush();
+			RealPartSave ps = fw.ps;
 			long done = ps.getDone();
 			Log.log(String.format("[D]program end, %s parts, done: %.1f%%", ps.parts.size(), 100.0f * done / blocks));
 			if (done == blocks) {
@@ -162,6 +167,8 @@ public class DL2 {
 			}
 			if (cnt > 0) {
 				Log.log(String.format("interrupt %s slow agents", cnt));
+				U.sleep(1000);
+				System.exit(0);
 			}
 		}
 	}

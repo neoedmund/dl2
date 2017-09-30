@@ -9,12 +9,12 @@ public class DLAgent {
 	int failed;
 	boolean live = true;
 	private String name;
-	private U.Part part;
-	U.PartSave ps;
+	private Part part;
+	PartSave ps;
 
 	Source1 src;
 
-	public DLAgent(U.PartSave ps, Source1 src, U.Part p, String name) {
+	public DLAgent(PartSave ps, Source1 src, Part p, String name) {
 		this.ps = ps;
 		this.src = src;
 		this.part = p;
@@ -37,20 +37,23 @@ public class DLAgent {
 		Downloader dl = new Downloader(name);
 		dl.download(src, start, len, true);
 		// write
+
 		synchronized (ps) {
-			long expect = part.start + part.doneLen;
 			if (part.doneLen > part.totalLen) {
-				say(String.format("[dl]part %s should be reassigned to others", pi));
+				say(String.format("[dl]drop, part %s has been reassigned to others", pi));
 				return;
 			}
+			long expect = part.start + part.doneLen;
 			if (expect != pi) {
-				say(String.format("[dl]drop dl part %s expected %s", pi, expect));
+				say(String.format("[dl]drop, part %s expected %s", pi, expect));
 				return;
 			}
+
 			// say("OK:" + pi + "/" + ps.blocks);
-			U.writeToFile(ps.fn, start, len, dl.ba);
+			ps.dl2.fw.add(pi, dl.ba);
 			part.incDoneLen(len);
-			ps.save(name + " " + src.getSpeed(len));
+			say(name + " " + src.getSpeed(len));
+			// ps.save(name + " " + );
 		}
 
 	}
@@ -108,9 +111,9 @@ public class DLAgent {
 		Log.log(String.format("%s:%s", name, s));
 	}
 
-	private U.Part seperateOthers() throws IOException {
+	private Part seperateOthers() throws IOException {
 		synchronized (ps) {
-			for (U.Part p : ps.parts) {
+			for (Part p : ps.parts) {
 				if (p == part || p.isDone())
 					continue;
 
@@ -120,7 +123,7 @@ public class DLAgent {
 					return p;
 				}
 			}
-			for (U.Part p : ps.parts) {
+			for (Part p : ps.parts) {
 				if (p == part || p.isDone())
 					continue;
 
@@ -147,14 +150,14 @@ public class DLAgent {
 							long right = remainLen - left;
 							long oldTotal = p.totalLen;
 							p.totalLen = p.doneLen + left;
-							U.Part np = new U.Part(ps);
+							Part np = new Part(ps);
 							np.start = p.start + p.totalLen;
 							np.totalLen = right;
 							np.agent = this;
 							ps.parts.add(np);
 							say(String.format("[sep][start %s,len %s,done %s, mid %s]", p.start, oldTotal, p.doneLen,
 									np.start));
-							ps.save(name);
+							// ps.save(name);
 							return np;
 						}
 					}
