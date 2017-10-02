@@ -9,7 +9,7 @@ public class RealPart {
 		return start <= pi && start + totalLen > pi;
 	}
 
-	public boolean isDone() {
-		return (doneLen >= totalLen);
-	}
+	// public boolean isDone() {
+	// return (doneLen >= totalLen);
+	// }
 }

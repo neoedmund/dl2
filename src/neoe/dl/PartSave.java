@@ -1,7 +1,6 @@
 package neoe.dl;
 
 import java.io.DataInputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
@@ -35,6 +34,9 @@ class PartSave {
 			long sum = 0;
 			for (Part p : parts) {
 				sum += p.doneLen;
+			}
+			if (sum >= blocks) {
+				allFinished = true;
 			}
 			return sum;
 		}
@@ -96,22 +98,21 @@ class PartSave {
 			Part p = new Part(this);
 			p.start = in.readLong();
 			p.totalLen = in.readLong();
-			p.doneLen = in.readLong();
+			p.doneLen = in.readLong();			
 			parts.add(p);
-		}
+		}		
 		in.close();
-
+		lastDone = getDone();
 		return true;
 
 	}
 
 	public RealPartSave snapshot() {
-		RealPartSave n = new RealPartSave(dl2);
+		RealPartSave n = new RealPartSave();
 		synchronized (this) {
 			n.blocks = this.blocks;
 			n.fn = this.fn;
 			n.fnps = this.fnps;
-			n.dl2 = this.dl2;
 			n.filesize = this.filesize;
 			n.parts = new ArrayList<>();
 			long sum = 0;

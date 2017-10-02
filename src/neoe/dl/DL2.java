@@ -17,7 +17,7 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "9h30".toString();
+	static final String ver = "9h30b".toString();
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 " + ver);
@@ -65,7 +65,6 @@ public class DL2 {
 		ps.filesize = filesize;
 		ps.fn = fn;
 		ps.fnps = U.getPsFile(fn);
-
 	}
 
 	private boolean doResumeDownloadParts() throws IOException {
@@ -78,8 +77,8 @@ public class DL2 {
 			// load fail
 			return false;
 		}
-
 		calcSize();
+		Log.log(String.format("done %d/%d", ps.getDone(), ps.blocks));
 		return true;
 	}
 
@@ -132,12 +131,13 @@ public class DL2 {
 		synchronized (this) {
 			this.wait();
 		}
-		
+
 		{
-			fw.flush();
+
 			RealPartSave ps = fw.ps;
 			long done = ps.getDone();
-			Log.log(String.format("[D]program end, %s parts, done: %.1f%%", ps.parts.size(), 100.0f * done / blocks));
+			Log.log(String.format("[D]program end, %s parts, done: %d/%d(%.1f%%)", ps.parts.size(), done, blocks,
+					100.0f * done / blocks));
 			if (done == blocks) {
 				ps.deleteFile();
 				{
@@ -168,7 +168,6 @@ public class DL2 {
 			if (cnt > 0) {
 				Log.log(String.format("interrupt %s slow agents", cnt));
 				U.sleep(1000);
-				System.exit(0);
 			}
 		}
 	}

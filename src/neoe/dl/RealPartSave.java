@@ -11,7 +11,7 @@ import neoe.util.Log;
 public class RealPartSave {
 	public boolean allFinished;
 	long blocks;
-	DL2 dl2;
+	// DL2 dl2;
 	long filesize;
 	String fn;
 	String fnps;
@@ -23,8 +23,7 @@ public class RealPartSave {
 	public long sum;
 	long sum0;
 
-	public RealPartSave(DL2 dl2) {
-		this.dl2 = dl2;
+	public RealPartSave() {
 		this.st0 = this.st1 = System.currentTimeMillis();
 	}
 
@@ -37,6 +36,9 @@ public class RealPartSave {
 		synchronized (this) {
 			for (RealPart p : parts) {
 				sum += p.doneLen;
+			}
+			if (sum >= blocks) {
+				allFinished = true;
 			}
 		}
 		return sum;
@@ -66,9 +68,9 @@ public class RealPartSave {
 				long speed = 0;
 				long t1 = System.currentTimeMillis() - st0;
 				if (t1 != 0)
-					speed = (sum-sum0) * DL2.blockSize / t1;
-				Log.log(String.format("parts %d %d/%d (%.1f%%) %,d KB/s by %s", parts.size(), sum, blocks,
-						100.0f * sum / blocks, speed, callerName));
+					speed = (sum - sum0) * DL2.blockSize / t1;
+				Log.log(String.format("%s: %d parts %d/%d (%.1f%%)\t%,d KB/s", callerName, parts.size(), sum, blocks,
+						100.0f * sum / blocks, speed));
 
 			}
 		}
@@ -83,8 +85,7 @@ public class RealPartSave {
 			RealPart pt = parts.get(partIndex);
 			if (pt.start + pt.doneLen == pi) {
 				pt.doneLen++;
-				if (pt.isDone())
-					inc();
+
 			} else {
 				RealPart np = new RealPart();
 				np.start = pi;
@@ -98,22 +99,26 @@ public class RealPartSave {
 				if (pt.totalLen <= 0) {
 					U.bug();
 				}
-				if (np.isDone()) {
-					inc();
-				}
-				if (pt.isDone()) {
-					inc();
-				}
 				parts.add(partIndex + 1, np);
 			}
+			inc();
 		}
 	}
 
 	private void inc() {
-		sum++;
+		synchronized (this) {
+			sum++;
+		}
 		if (sum >= blocks) {
-			Log.log("FileWriter all Finished");
-			allFinished = true;
+			long sum2 = getDone();
+			if (sum2 != sum) {
+				Log.log(String.format("bug:sum from %d set to %s", sum, sum2));
+				sum = sum2;
+			}
+			if (sum >= blocks) {
+				Log.log("FileWriter all Finished");
+				allFinished = true;
+			}
 		}
 	}
 

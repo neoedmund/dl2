@@ -34,6 +34,9 @@ public class FileWriter {
 					}
 				}
 				Log.log("FileWriter finished.");
+				synchronized (dl2) {
+					dl2.notifyAll();
+				}
 			}
 		}.start();
 	}
@@ -50,7 +53,7 @@ public class FileWriter {
 			long pi = (long) r[0];
 			byte[] ba = (byte[]) r[1];
 			long start = DL2.blockSize * pi;
-			long len = DL2.blockSize;
+			long len = (long) r[2];
 			writeToFile(f, start, len, ba);
 			ps.add(pi);
 		}
@@ -63,15 +66,19 @@ public class FileWriter {
 		f.write(ba, 0, (int) len);
 	}
 
-	public void flush() throws Exception {
-		while (queue.size() > 0) {
-			U.sleep(300);
-			Log.log("wait FileWriter to finish:" + queue.size());
-		}
-	}
+	// public void flush() throws Exception {
+	// while (!ps.allFinished) {
+	// Log.log(String.format("wait FileWriter to finish:%s (%s/%s)", queue.size(),
+	// ps.getDone(), ps.blocks));
+	// U.sleep(300);
+	// }
+	// }
 
-	public void add(long pi, byte[] ba) {
-		queue.add(new Object[] { pi, ba });
+	public void add(long pi, byte[] ba, long len) {
+		if (len != ba.length) {
+			U.bug();
+		}
+		queue.add(new Object[] { pi, ba, len });
 	}
 
 	private ConcurrentLinkedQueue<Object[]> queue = new ConcurrentLinkedQueue<Object[]>();

@@ -52,10 +52,6 @@ class Part /*implements Comparable<Part>*/ {
 				if (done == ps.blocks) {
 					Log.log("download finished:" + ps.fn);
 					ps.allFinished = true;
-					synchronized (ps.dl2) {
-						ps.dl2.notifyAll();
-					}
-
 				}
 			}
 		}

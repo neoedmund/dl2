@@ -50,9 +50,9 @@ public class DLAgent {
 			}
 
 			// say("OK:" + pi + "/" + ps.blocks);
-			ps.dl2.fw.add(pi, dl.ba);
+			ps.dl2.fw.add(pi, dl.ba, len);
 			part.incDoneLen(len);
-			say(name + " " + src.getSpeed(len));
+			say(src.getSpeed(len));
 			// ps.save(name + " " + );
 		}
 
