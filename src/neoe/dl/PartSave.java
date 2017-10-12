@@ -37,6 +37,8 @@ class PartSave {
 			}
 			if (sum >= blocks) {
 				allFinished = true;
+			} else {
+				allFinished = false;
 			}
 			return sum;
 		}
@@ -64,20 +66,22 @@ class PartSave {
 			s1 += unitsize;
 		}
 		Log.log(String.format("alloc %s size=%,d", fn, filesize));
-		RandomAccessFile f = new RandomAccessFile(fn, "rw");
-		f.setLength(filesize);
-		f.close();
+		{
+			RandomAccessFile f = new RandomAccessFile(fn, "rw");
+			f.setLength(filesize);
+			f.close();
+		}
 		Log.log("alloc OK");
 	}
 
 	public boolean load(String psFile, long filesize) throws IOException {
 
 		this.filesize = filesize;
-		DataInputStream in = new DataInputStream(new FileInputStream(psFile));
+		FileInputStream fi;
+		DataInputStream in = new DataInputStream(fi = new FileInputStream(psFile));
 		{
 			int i = in.readInt();
 			if (i != DL2.ps_version) {
-
 				Log.log(String.format("cannot resume, ps_versoin not same(%s expect %s)", i, DL2.ps_version));
 				return false;
 			}
@@ -98,10 +102,11 @@ class PartSave {
 			Part p = new Part(this);
 			p.start = in.readLong();
 			p.totalLen = in.readLong();
-			p.doneLen = in.readLong();			
+			p.doneLen = in.readLong();
 			parts.add(p);
-		}		
+		}
 		in.close();
+		fi.close();
 		lastDone = getDone();
 		return true;
 

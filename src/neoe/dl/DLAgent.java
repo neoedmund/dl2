@@ -52,14 +52,18 @@ public class DLAgent {
 			// say("OK:" + pi + "/" + ps.blocks);
 			ps.dl2.fw.add(pi, dl.ba, len);
 			part.incDoneLen(len);
-			say(src.getSpeed(len));
+			if (ps.dl2.conf.source.size() > 1) {
+				// to see speed from different source
+				say(src.getSpeed(len));
+			}
+
 			// ps.save(name + " " + );
 		}
 
 	}
 
 	public void run() {
-		say("start");
+		say("start " + part);
 		try {
 			while (true) { // on total
 				while (true) { // on part
@@ -112,6 +116,7 @@ public class DLAgent {
 	}
 
 	private Part seperateOthers() throws IOException {
+		// Log.log("seperateOthers:"+ps.parts);
 		synchronized (ps) {
 			for (Part p : ps.parts) {
 				if (p == part || p.isDone())
@@ -121,6 +126,8 @@ public class DLAgent {
 					p.agent = this;
 					say("[sep]take over " + p);
 					return p;
+				} else {
+					// say("[d]part agent=" + p.agent);
 				}
 			}
 			for (Part p : ps.parts) {

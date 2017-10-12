@@ -33,82 +33,76 @@ public class RealPartSave {
 
 	long getDone() {
 		long sum = 0;
-		synchronized (this) {
-			for (RealPart p : parts) {
-				sum += p.doneLen;
-			}
-			if (sum >= blocks) {
-				allFinished = true;
-			}
+		for (RealPart p : parts) {
+			sum += p.doneLen;
+		}
+		if (sum >= blocks) {
+			allFinished = true;
 		}
 		return sum;
 	}
 
 	void save(String callerName) throws IOException {
-		synchronized (this) {
-			String tmpf = fnps + "." + U.ts36();
-			DataOutputStream out = new DataOutputStream(new FileOutputStream(tmpf));
-			out.writeInt(DL2.ps_version);
-			out.writeInt(DL2.blockSize);
-			out.writeLong(filesize);
-			out.writeLong(parts.size());
-			long sum = 0;
-			for (RealPart p : parts) {
-				out.writeLong(p.start);
-				out.writeLong(p.totalLen);
-				out.writeLong(p.doneLen);
-				sum += p.doneLen;
-			}
-			out.close();
-			File f1 = new File(fnps);
-			File f2 = new File(tmpf);
-			f1.delete();
-			f2.renameTo(f1);
-			{
-				long speed = 0;
-				long t1 = System.currentTimeMillis() - st0;
-				if (t1 != 0)
-					speed = (sum - sum0) * DL2.blockSize / t1;
-				Log.log(String.format("%s: %d parts %d/%d (%.1f%%)\t%,d KB/s", callerName, parts.size(), sum, blocks,
-						100.0f * sum / blocks, speed));
+		String tmpf = fnps + "." + U.ts36();
+		FileOutputStream fo;
+		DataOutputStream out = new DataOutputStream(fo = new FileOutputStream(tmpf));
+		out.writeInt(DL2.ps_version);
+		out.writeInt(DL2.blockSize);
+		out.writeLong(filesize);
+		out.writeLong(parts.size());
+		long sum = 0;
+		for (RealPart p : parts) {
+			out.writeLong(p.start);
+			out.writeLong(p.totalLen);
+			out.writeLong(p.doneLen);
+			sum += p.doneLen;
+		}
+		out.close();
+		fo.close();
+		File f1 = new File(fnps);
+		File f2 = new File(tmpf);
+		f1.delete();
+		f2.renameTo(f1);
+		{
+			long speed = 0;
+			long t1 = System.currentTimeMillis() - st0;
+			if (t1 != 0)
+				speed = (sum - sum0) * DL2.blockSize / t1;
+			Log.log(String.format("%s: %d parts %d/%d (%.1f%%)\t%,d KB/s", callerName, parts.size(), sum, blocks,
+					100.0f * sum / blocks, speed));
 
-			}
 		}
 	}
 
 	public void add(long pi) {
-		synchronized (this) {
-			int partIndex = getPartIndex(pi, 0, parts.size() - 1);
-			if (partIndex < 0) {
+		int partIndex = getPartIndex(pi, 0, parts.size() - 1);
+		if (partIndex < 0) {
+			U.bug();
+		}
+		RealPart pt = parts.get(partIndex);
+		if (pt.start + pt.doneLen == pi) {
+			pt.doneLen++;
+
+		} else {
+			RealPart np = new RealPart();
+			np.start = pi;
+			np.totalLen = pt.totalLen - (pi - pt.start);
+			if (np.totalLen <= 0) {
 				U.bug();
 			}
-			RealPart pt = parts.get(partIndex);
-			if (pt.start + pt.doneLen == pi) {
-				pt.doneLen++;
 
-			} else {
-				RealPart np = new RealPart();
-				np.start = pi;
-				np.totalLen = pt.totalLen - (pi - pt.start);
-				if (np.totalLen <= 0) {
-					U.bug();
-				}
-
-				np.doneLen = 1;
-				pt.totalLen = pi - pt.start;
-				if (pt.totalLen <= 0) {
-					U.bug();
-				}
-				parts.add(partIndex + 1, np);
+			np.doneLen = 1;
+			pt.totalLen = pi - pt.start;
+			if (pt.totalLen <= 0) {
+				U.bug();
 			}
-			inc();
+			parts.add(partIndex + 1, np);
 		}
+		inc();
 	}
 
 	private void inc() {
-		synchronized (this) {
-			sum++;
-		}
+		sum++;
 		if (sum >= blocks) {
 			long sum2 = getDone();
 			if (sum2 != sum) {
@@ -116,7 +110,7 @@ public class RealPartSave {
 				sum = sum2;
 			}
 			if (sum >= blocks) {
-				Log.log("FileWriter all Finished");
+				Log.log("write finished");
 				allFinished = true;
 			}
 		}

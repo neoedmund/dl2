@@ -19,7 +19,7 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "10h12a".toString();
+	static final String ver = "10h12b".toString();
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 " + ver);
@@ -56,7 +56,7 @@ public class DL2 {
 	private long filesize;
 	String fn;
 	PartSave ps = new PartSave(this);
-	FileWriter fw = new FileWriter(this);
+	FileWriter fw;
 
 	long remain;
 
@@ -98,6 +98,7 @@ public class DL2 {
 		}
 		if (!ps.load(U.getPsFile(fn), filesize)) {
 			// load fail
+			Log.log("load fail");
 			return false;
 		}
 		calcSize();
@@ -110,12 +111,10 @@ public class DL2 {
 		if (error)
 			Log.log("dead agent count:" + agentDown);
 		if (agentDown >= agentCnt) {
-			if (!ps.allFinished)
+			if (!ps.allFinished) {
 				Log.log("all agents dead! download fail.");
-			synchronized (this) {
-				this.notifyAll();
+				fw.outError = true;
 			}
-
 		}
 
 	}
@@ -126,7 +125,9 @@ public class DL2 {
 			System.err.println("nothing to download, exit");
 			return;
 		}
+
 		filesize = U.checkFileSize(conf.source);
+
 		if (filesize <= 0) {
 			Log.log("exit because filesize=" + filesize);
 			return;
@@ -143,10 +144,11 @@ public class DL2 {
 		} else {
 			doDownloadInit();
 		}
+		fw = new FileWriter(this);
 		fw.ps = ps.snapshot();
 		{
 			long done = ps.getDone();
-			Log.log(String.format("[D]start %s parts, done: %.1f%%", ps.parts.size(), 100.0f * done / blocks));
+			Log.log(String.format("Start %s parts, done: %.1f%%", ps.parts.size(), 100.0f * done / blocks));
 		}
 
 		List<Thread> agentThreads = startAgents();
@@ -155,10 +157,9 @@ public class DL2 {
 		}
 
 		{
-
 			RealPartSave ps = fw.ps;
 			long done = ps.getDone();
-			Log.log(String.format("[D]program end, %s parts, done: %d/%d(%.1f%%)", ps.parts.size(), done, blocks,
+			Log.log(String.format("Program end, %s parts, done: %d/%d(%.1f%%)", ps.parts.size(), done, blocks,
 					100.0f * done / blocks));
 			if (done == blocks) {
 				ps.deleteFile();
@@ -166,6 +167,7 @@ public class DL2 {
 					if (fn.endsWith(U.DOWNLOADING)) {
 						String fn2 = fn.substring(0, fn.length() - U.DOWNLOADING.length());
 						new File(fn).renameTo(new File(fn2));
+						Log.log("renamed to " + fn2);
 					}
 				}
 			}

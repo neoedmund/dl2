@@ -1,7 +1,10 @@
 package neoe.dl;
 
 import java.io.RandomAccessFile;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import neoe.util.Log;
 
@@ -17,17 +20,25 @@ public class FileWriter {
 				Log.log("FileWriter started.");
 				while (true) {
 					try {
-						int size = queue.size();
-						if (size > 0) {
-							writes(size);
+						// Log.log("FileWriter check");
+						if (!queue.isEmpty()) {
+							// Log.log("FileWriter has data");
+							List<Object[]> buf = new ArrayList<>();
+							queue.drainTo(buf);
+							// Log.log("FileWriter size:" + buf.size());
+							writes(buf);
+							// Log.log("FileWriter write:" + buf.size());
 						} else {
 							if (ps != null && ps.allFinished) {
 								break;
 							}
-							// Log.log("FileWriter no data");
+							if (outError) {
+								Log.log("FileWriter exit because outer error");
+								break;
+							}
 							Thread.sleep(1000);
 						}
-						Thread.sleep(100);
+						Thread.sleep(300);
 					} catch (Throwable e) {
 						e.printStackTrace();
 						U.sleep(1000);
@@ -41,11 +52,11 @@ public class FileWriter {
 		}.start();
 	}
 
-	protected void writes(int size) throws Exception {
+	protected void writes(List<Object[]> buf) throws Exception {
 		// Log.log("FileWriter writing "+size);
 		RandomAccessFile f = new RandomAccessFile(dl2.fn, "rw");
-		for (int i = 0; i < size; i++) {
-			Object[] r = (Object[]) queue.poll();
+		for (Object[] r : buf) {
+
 			if (r == null) {
 				U.bug();
 				return;
@@ -53,12 +64,15 @@ public class FileWriter {
 			long pi = (long) r[0];
 			byte[] ba = (byte[]) r[1];
 			long start = DL2.blockSize * pi;
+			// Log.log("writing "+start);
 			long len = (long) r[2];
 			writeToFile(f, start, len, ba);
+			// Log.log("writing p0 ");
 			ps.add(pi);
+			// Log.log("write "+start);
 		}
 		f.close();
-		ps.save("FileWriter " + size);
+		ps.save("FileWriter " + buf.size());// + " t=" + Thread.currentThread().getId());
 	}
 
 	private static void writeToFile(RandomAccessFile f, long start, long len, byte[] ba) throws Exception {
@@ -81,6 +95,7 @@ public class FileWriter {
 		queue.add(new Object[] { pi, ba, len });
 	}
 
-	private ConcurrentLinkedQueue<Object[]> queue = new ConcurrentLinkedQueue<Object[]>();
+	private BlockingQueue<Object[]> queue = new LinkedBlockingQueue<Object[]>(5000);
+	public boolean outError = false;
 
 }

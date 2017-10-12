@@ -2,7 +2,7 @@ package neoe.dl;
 
 import neoe.util.Log;
 
-class Part /*implements Comparable<Part>*/ {
+class Part /* implements Comparable<Part> */ {
 	DLAgent agent;
 	long doneLen;
 	private PartSave ps;
@@ -13,14 +13,14 @@ class Part /*implements Comparable<Part>*/ {
 		this.ps = ps;
 	}
 
-//	@Override
-//	public int compareTo(Part p2) {
-//		if (start > p2.start)
-//			return 1;
-//		if (start == p2.start)
-//			return 0;
-//		return -1;
-//	}
+	// @Override
+	// public int compareTo(Part p2) {
+	// if (start > p2.start)
+	// return 1;
+	// if (start == p2.start)
+	// return 0;
+	// return -1;
+	// }
 
 	public long getNext() {
 		synchronized (ps) {
@@ -47,8 +47,8 @@ class Part /*implements Comparable<Part>*/ {
 			ps.sum += len;
 			if (doneLen >= totalLen) {
 				long done = ps.getDone();
-				Log.log(String.format("progress %d/%d(%.1f%%) %sKB/s", done, ps.blocks, 100.0f * done / ps.blocks,
-						getSpeed(done)));
+				// Log.log(String.format("progress %d/%d(%.1f%%) %sKB/s", done, ps.blocks,
+				// 100.0f * done / ps.blocks,getSpeed(done)));
 				if (done == ps.blocks) {
 					Log.log("download finished:" + ps.fn);
 					ps.allFinished = true;
@@ -57,11 +57,9 @@ class Part /*implements Comparable<Part>*/ {
 		}
 	}
 
-
 	public String toString() {
 		return String.format("[%s+%s/%s]", start, doneLen, totalLen);
 	}
-
 
 	public boolean isDone() {
 		synchronized (ps) {
@@ -71,9 +69,9 @@ class Part /*implements Comparable<Part>*/ {
 
 	public RealPart dup() {
 		RealPart p = new RealPart();
-		p.start=this.start;
-		p.totalLen=this.totalLen;
-		p.doneLen=this.doneLen;
+		p.start = this.start;
+		p.totalLen = this.totalLen;
+		p.doneLen = this.doneLen;
 		return p;
 	}
 }

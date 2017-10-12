@@ -127,7 +127,7 @@ public class Downloader {
 				ex1 = ex;
 			}
 			if (error) {
-				// Log.log("found error:" + ex1);
+				Log.log("net warn:" + ex1);
 				String errorString = "" + ex1;
 				if (errorString.indexOf("java.io.FileNotFoundException") >= 0) {
 					throw new DL2Exception("should be 404, skip");
@@ -136,7 +136,6 @@ public class Downloader {
 					throw new DL2Exception("connect timed out");
 				}
 				throw new RuntimeException("download fail via proxy:" + proxy, ex1);
-
 			} else {
 				return;
 			}
