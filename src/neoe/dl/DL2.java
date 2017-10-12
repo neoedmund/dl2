@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -17,13 +19,34 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "9h30b".toString();
+	static final String ver = "10h12a".toString();
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 " + ver);
 		// http://docs.oracle.com/javase/6/docs/technotes/guides/net/http-keepalive.html
 		System.setProperty("http.maxConnections", "999");
-		new DL2().run(args[0]);
+		Map m;
+		if (args.length == 1) {
+			String confn = args[0];
+			m = (Map) PyData.parseAll(FileUtil.readString(new FileInputStream(confn), null), false);
+		} else {
+			if ("-u".equals(args[0])) {
+				m = new HashMap();
+				m.put("url", PyData.parseAll(String.format("[[url1 \"%s\" ]]", args[1])));
+				m.put("proxy", Collections.EMPTY_LIST);
+				m.put("source", PyData.parseAll("[[DIRECT url1 head1 4]]"));
+				m.put("httpHeader", PyData.parseAll(String.format("[[ head1 {\"user-agent\": \"%s\"}]]", U.DEF_AGENT)));
+			} else {
+				usage();
+				return;
+			}
+		}
+		new DL2().run(m);
+	}
+
+	private static void usage() {
+		System.out.println("Usage: dl2 <dl2conf> OR dl2 -u <url>");
+
 	}
 
 	private int agentCnt;
@@ -97,8 +120,7 @@ public class DL2 {
 
 	}
 
-	public void run(String confn) throws Exception {
-		Map m = (Map) PyData.parseAll(FileUtil.readString(new FileInputStream(confn), null), false);
+	public void run(Map m) throws Exception {
 		conf.init(m);
 		if (conf.source.isEmpty()) {
 			System.err.println("nothing to download, exit");

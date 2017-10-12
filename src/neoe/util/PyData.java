@@ -4,8 +4,10 @@ package neoe.util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,12 +25,71 @@ public class PyData {
 
 	private boolean sepByComma;
 
+	private boolean lastIsRN;
+
+	/** for dump */
 	public PyData() {
-		this(true);
+		lastIsRN = false;
 	}
 
-	public PyData(boolean sepByComma) {
+	public void dump(Object data, Writer out, String indent, boolean listIndex) throws IOException {
+
+		if (data == null)
+			return;
+		if (data instanceof List) {
+			if (lastIsRN)
+				out.write(indent);
+
+			out.write("[\n");
+
+			lastIsRN = true;
+			List l = (List) data;
+			int i = 0;
+			for (Object o : l) {
+				if (listIndex) {
+					out.write(String.format(" /*%s*/ ", i++));
+				}
+				dump(o, out, indent + "  ", listIndex);
+			}
+			if (!lastIsRN)
+				out.write("\n");
+			out.write(indent);
+			out.write("]\n");
+			lastIsRN = true;
+		} else if (data instanceof Map) {
+			if (lastIsRN)
+				out.write(indent);
+			out.write("{\n");
+			lastIsRN = true;
+			Map m = (Map) data;
+			String in2 = indent + "  ";
+			for (Object o : m.keySet()) {
+				out.write(in2);
+				out.write(o.toString());
+				out.write(":");
+				lastIsRN = false;
+				dump(o, out, in2, listIndex);
+				out.write("\n");
+			}
+			if (!lastIsRN)
+				out.write("\n");
+			out.write(indent);
+			out.write("}\n");
+			lastIsRN = true;
+		} else {
+			if (lastIsRN)
+				out.write(indent);
+			out.write("`");
+			out.write(data.toString());
+			out.write("`");
+			out.write("\t");
+			lastIsRN = false;
+		}
+	}
+
+	public PyData(boolean sepByComma, boolean useEscape) {
 		this.sepByComma = sepByComma;
+		this.useEscape = useEscape;
 	}
 
 	public static void main(String[] args) throws Exception {
@@ -43,14 +104,20 @@ public class PyData {
 		System.out.println("V=" + o);
 	}
 
-	public static Object parseAll(String s, boolean sepByComma) throws Exception {
-		Object o = new PyData(sepByComma).parseAll(new StringReader(s));
+	public static Object parseAll(String s, boolean sepByComma, boolean useEscape) throws Exception {
+		Object o = new PyData(sepByComma, useEscape).parseAll(new StringReader(s));
 		return o;
+	}
+
+	public static Object parseAll(String s, boolean sepByComma) throws Exception {
+		return parseAll(s, sepByComma, false);
 	}
 
 	StringBuffer buf = new StringBuffer();
 
 	int lno = 1, pos;
+
+	private boolean useEscape = false;
 
 	String at() {
 		return " at line:" + lno + " pos:" + pos;
@@ -245,7 +312,8 @@ public class PyData {
 					break;
 				}
 			}
-			if (i == '\\') {
+
+			if (i == '\\' && useEscape) {
 				i = xread(in);
 				if (i == 'n')
 					i = '\n';
@@ -253,6 +321,7 @@ public class PyData {
 					i = '\r';
 				else if (i == 't')
 					i = '\t';
+
 			}
 			if (i == EOF) {
 				throw new Exception("Expected to read " + end + " but EOF found" + at());
@@ -324,7 +393,11 @@ public class PyData {
 	}
 
 	public static Object parseAll(String s) throws Exception {
-		return parseAll(s, true);
+		return parseAll(s, false, false);
+	}
+
+	public static Object parseFile(String fn) throws Exception {
+		return parseAll(FileUtil.readString(new FileInputStream(fn), null), false);
 	}
 
 }
