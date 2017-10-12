@@ -52,11 +52,11 @@ public class DLAgent {
 			// say("OK:" + pi + "/" + ps.blocks);
 			ps.dl2.fw.add(pi, dl.ba, len);
 			part.incDoneLen(len);
+			String sp = src.getSpeed(len);
 			if (ps.dl2.conf.source.size() > 1) {
 				// to see speed from different source
-				say(src.getSpeed(len));
+				say(sp);
 			}
-
 			// ps.save(name + " " + );
 		}
 

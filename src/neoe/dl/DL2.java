@@ -19,7 +19,7 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "10h12b".toString();
+	static final String ver = "10h12c".toString();
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 " + ver);
@@ -156,7 +156,7 @@ public class DL2 {
 			this.wait();
 		}
 
-		{
+		{ // renanme file
 			RealPartSave ps = fw.ps;
 			long done = ps.getDone();
 			Log.log(String.format("Program end, %s parts, done: %d/%d(%.1f%%)", ps.parts.size(), done, blocks,
@@ -172,14 +172,16 @@ public class DL2 {
 				}
 			}
 		}
-		long t1 = System.currentTimeMillis();
-		long t = t1 - ps.st0;
-		if (t == 0)
-			Log.log(String.format("total speed:MAX, %,dbytes in %,d sec", ps.sum, t / 1000));
-		else
-			Log.log(String.format("total speed:%,dKB/s, %,dbytes in %,d sec", ps.sum / t, ps.sum, t / 1000));
-		for (Source1 src : conf.source) {
-			Log.log("|-" + src.getSpeed());
+		{ // display sum
+			long t1 = System.currentTimeMillis();
+			long t = t1 - ps.st0;
+			if (t == 0)
+				Log.log(String.format("total speed:MAX, %,d bytes in %,d sec", ps.sum, t / 1000));
+			else
+				Log.log(String.format("total speed:%,d KB/s, %,d bytes in %,d sec", ps.sum / t, ps.sum, t / 1000));
+			for (Source1 src : conf.source) {
+				Log.log("|-" + src.getSpeed());
+			}
 		}
 		{// stop slow agents
 			int cnt = 0;
@@ -191,7 +193,7 @@ public class DL2 {
 			}
 			if (cnt > 0) {
 				Log.log(String.format("interrupt %s slow agents", cnt));
-				U.sleep(1000);
+				// U.sleep(1000);
 			}
 		}
 	}
