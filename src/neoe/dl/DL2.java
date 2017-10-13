@@ -19,7 +19,9 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "10h12c".toString();
+	static final String ver = "10h13a".toString();
+
+	boolean console = true;
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 " + ver);
@@ -193,7 +195,10 @@ public class DL2 {
 			}
 			if (cnt > 0) {
 				Log.log(String.format("interrupt %s slow agents", cnt));
-				// U.sleep(1000);
+				U.sleep(1000);
+				if (console) {
+					System.exit(0);
+				}
 			}
 		}
 	}

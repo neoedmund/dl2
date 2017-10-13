@@ -50,6 +50,10 @@ public class DLAgent {
 			}
 
 			// say("OK:" + pi + "/" + ps.blocks);
+			if (dl.ba.length != len) {
+				say(String.format("[dl]drop, down len not right, got %s expected %s", dl.ba.length, len));
+				return;
+			}
 			ps.dl2.fw.add(pi, dl.ba, len);
 			part.incDoneLen(len);
 			String sp = src.getSpeed(len);
