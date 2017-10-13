@@ -62,6 +62,7 @@ public class Downloader {
 			if (p1 >= 0)
 				return Long.parseLong(s1.substring(p1 + 1));
 		}
+		Log.log(String.format("Maybe no support for ranged download, %s, respHeader=%s", reqHeader.get("Range"), respHeader));
 		return null;
 	}
 

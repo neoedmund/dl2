@@ -82,7 +82,8 @@ public class Log {
 				t.printStackTrace(out);
 			}
 			out.flush();
-			if (stdout || s0.indexOf('[') < 0)
+			int p1 = s0.indexOf('[');
+			if (stdout || p1 != 0)
 				System.out.print(sb.toString());
 		} catch (Exception ex) {
 			ex.printStackTrace();

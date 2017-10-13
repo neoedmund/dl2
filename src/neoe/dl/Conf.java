@@ -22,7 +22,7 @@ class Conf {
 	int failCnt;
 
 	public void init(Map m) {
-		Log.log("load config:" + m);
+		Log.log("[d]load config:" + m);
 		loadProxy((List) m.get("proxy"));
 		loadHeader((List) m.get("httpHeader"));
 		loadUrl((List) m.get("url"));
