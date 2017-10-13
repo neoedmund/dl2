@@ -6,9 +6,10 @@ import neoe.util.Log;
 
 public class DLAgent {
 	private static final boolean DONNT_SEP_SAME_SOURCE = false;
+	private static final boolean VERBOSE_SRC = false;
 	int failed;
 	boolean live = true;
-	private String name;
+	public String name;
 	private Part part;
 	PartSave ps;
 
@@ -16,9 +17,10 @@ public class DLAgent {
 
 	public DLAgent(PartSave ps, Source1 src, Part p, String name) {
 		this.ps = ps;
-		this.src = src;
+		this.src = src.clone();
 		this.part = p;
 		this.name = name;
+		this.src.name = name;
 
 	}
 
@@ -56,11 +58,17 @@ public class DLAgent {
 			}
 			ps.dl2.fw.add(pi, dl.ba, len);
 			part.incDoneLen(len);
-			String sp = src.getSpeed(len);
-			if (ps.dl2.conf.source.size() > 1) {
-				// to see speed from different source
-				say(sp);
+
+			if (VERBOSE_SRC) {
+				String sp = src.getSpeed(len, true);
+				if (ps.dl2.conf.source.size() > 1) {
+					// to see speed from different source
+					say(sp);
+				}
+			} else {
+				src.getSpeed(len, false);
 			}
+
 			// ps.save(name + " " + );
 		}
 

@@ -39,12 +39,14 @@ public class Downloader {
 	private boolean usePart;
 	boolean useProxy;
 
+	private Source1 src;
+
 	public Downloader(String name) {
 		this.name = name;
 	}
 
 	public void download(Source1 src, long start, long len, boolean readContent) throws Exception {
-
+		this.src = src;
 		setConfig(src);
 		setPart(start, len);
 		this.readContent = readContent;
@@ -69,6 +71,8 @@ public class Downloader {
 		return new String(ba, enc);
 	}
 
+	int redirect = 0;
+
 	public void run() throws Exception {
 		ba = emptyBA;
 		retry = 0;
@@ -87,7 +91,7 @@ public class Downloader {
 				// Log.log(String.format("[D]connect"));
 				conn = u.openConnection();
 			}
-			conn.setConnectTimeout(3000);
+			conn.setConnectTimeout(9000);
 			// set headers
 			for (Object o : reqHeader.keySet()) {
 				conn.setRequestProperty((String) o, reqHeader.get(o).toString());
@@ -96,6 +100,20 @@ public class Downloader {
 			Exception ex1 = null;
 			try {
 				respHeader = conn.getHeaderFields();
+				{
+					String loc = getStr((List) respHeader.get("Location"));
+					if (loc != null && !loc.isEmpty()) {
+						redirect++;
+						if (redirect > 10) {
+							throw new RuntimeException("too many redirect");
+						}
+						Log.log(String.format("source %s redirect(%s) to %s", src.name, redirect, loc));
+						src.url = loc;
+						url = loc;
+						run();
+						return;
+					}
+				}
 				// Log.log(String.format("[DD %s|%s]respHeader=%s", name,
 				// reqHeader.get("Range"), respHeader));
 				if (readContent) {
@@ -145,6 +163,12 @@ public class Downloader {
 	// private void say(String s) {
 	// Log.log(name + ":" + s);
 	// }
+
+	private static String getStr(List list) {
+		if (list == null || list.size() <= 0)
+			return null;
+		return (String) list.get(0);
+	}
 
 	public void savePage(String path) throws Exception {
 		if (ba == null) {

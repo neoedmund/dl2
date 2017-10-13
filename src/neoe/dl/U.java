@@ -7,7 +7,8 @@ import neoe.util.Log;
 
 public class U {
 
-	public static final String DEF_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0".toString();
+	public static final String DEF_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0"
+			.toString();
 
 	interface Func {
 		Object func(Object o) throws Exception;
@@ -18,9 +19,10 @@ public class U {
 
 			@Override
 			public Object func(Object o) throws Exception {
-				Source1 src = (Source1) o;
+				Source1 src = ((Source1) o).clone();
 				Downloader dl = new Downloader(src.name);
 				dl.download(src, 0, 1, false);// get 1 bytes
+				// System.out.println("content:"+new String(dl.ba));
 				return dl.getFileLength();
 			}
 		});
@@ -48,6 +50,9 @@ public class U {
 		if (fn == null) {
 			fn = "dl_" + Long.toString(System.currentTimeMillis(), 36);
 			Log.log("[W]cannot get filename from url use:" + fn);
+		}
+		if (new File(fn).exists()) {
+			throw new RuntimeException("file already exists:" + fn);
 		}
 		{
 			fn = fn + DOWNLOADING;
@@ -108,8 +113,9 @@ public class U {
 								}
 							}
 						}
-					} catch (Exception e) {
+					} catch (Throwable e) {
 						e.printStackTrace();
+						Log.log("[e]" + e);
 					} finally {
 						synchronized (finished) {
 							finished[0]++;

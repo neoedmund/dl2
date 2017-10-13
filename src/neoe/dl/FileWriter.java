@@ -3,7 +3,6 @@ package neoe.dl;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import neoe.util.Log;
@@ -18,16 +17,18 @@ public class FileWriter {
 		new Thread() {
 			public void run() {
 				Log.log("FileWriter started.");
+
 				while (true) {
 					try {
 						// Log.log("FileWriter check");
+						queue.size();
 						if (!queue.isEmpty()) {
-							// Log.log("FileWriter has data");
+							// Log.log("[D]FileWriter has data");
 							List<Object[]> buf = new ArrayList<>();
 							queue.drainTo(buf);
-							// Log.log("FileWriter size:" + buf.size());
+							// Log.log("[D]FileWriter size:" + buf.size());
 							writes(buf);
-							// Log.log("FileWriter write:" + buf.size());
+							// Log.log("[D]FileWriter write:" + buf.size());
 						} else {
 							if (ps != null && ps.allFinished) {
 								break;
@@ -56,7 +57,6 @@ public class FileWriter {
 		// Log.log("FileWriter writing "+size);
 		RandomAccessFile f = new RandomAccessFile(dl2.fn, "rw");
 		for (Object[] r : buf) {
-
 			if (r == null) {
 				U.bug();
 				return;
@@ -95,7 +95,7 @@ public class FileWriter {
 		queue.add(new Object[] { pi, ba, len });
 	}
 
-	private BlockingQueue<Object[]> queue = new LinkedBlockingQueue<Object[]>(5000);
+	private LinkedBlockingQueue<Object[]> queue = new LinkedBlockingQueue<Object[]>(5000);
 	public boolean outError = false;
 
 }

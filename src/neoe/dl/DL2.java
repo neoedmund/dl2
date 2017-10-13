@@ -19,7 +19,7 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "10h13a".toString();
+	static final String ver = "10h13b".toString();
 
 	boolean console = true;
 
@@ -181,8 +181,8 @@ public class DL2 {
 				Log.log(String.format("total speed:MAX, %,d bytes in %,d sec", ps.sum, t / 1000));
 			else
 				Log.log(String.format("total speed:%,d KB/s, %,d bytes in %,d sec", ps.sum / t, ps.sum, t / 1000));
-			for (Source1 src : conf.source) {
-				Log.log("|-" + src.getSpeed());
+			for (DLAgent a : agents) {
+				Log.log("|-" + a.src.getSpeed() + " " + a.src.name);
 			}
 		}
 		{// stop slow agents
@@ -203,6 +203,8 @@ public class DL2 {
 		}
 	}
 
+	List<DLAgent> agents = new ArrayList<>();
+
 	private List<Thread> startAgents() {
 		Log.log("start agents");
 		int cnt = 0;
@@ -210,6 +212,7 @@ public class DL2 {
 		for (final Source1 src : conf.source) {
 			for (int i = 0; i < src.concurrent; i++) {
 				final DLAgent agent = new DLAgent(ps, src, null, src.name + ":" + i + "/" + src.concurrent);
+				agents.add(agent);
 				cnt++;
 				Thread t = new Thread() {
 					public void run() {
