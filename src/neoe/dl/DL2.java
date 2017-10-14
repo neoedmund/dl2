@@ -19,35 +19,73 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "10h13c".toString();
+	static final String ver = "10h14a".toString();
 
 	boolean console = true;
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 " + ver);
+		if (args.length == 0) {
+			usage();
+			return;
+		}
 		// http://docs.oracle.com/javase/6/docs/technotes/guides/net/http-keepalive.html
 		System.setProperty("http.maxConnections", "999");
+
 		Map m;
 		if (args.length == 1) {
 			String confn = args[0];
 			m = (Map) PyData.parseAll(FileUtil.readString(new FileInputStream(confn), null), false);
 		} else {
-			if ("-u".equals(args[0])) {
-				m = new HashMap();
-				m.put("url", PyData.parseAll(String.format("[[url1 \"%s\" ]]", args[1])));
-				m.put("proxy", Collections.EMPTY_LIST);
-				m.put("source", PyData.parseAll("[[DIRECT url1 head1 4]]"));
-				m.put("httpHeader", PyData.parseAll(String.format("[[ head1 {\"user-agent\": \"%s\"}]]", U.DEF_AGENT)));
-			} else {
-				usage();
-				return;
+			List urls = new ArrayList();
+			int cc = 4;
+			for (int i = 0; i < args.length; i++) {
+				String s = args[i];
+
+				if ("-u".equals(s)) {
+					i++;
+					urls.add(args[i]);
+				} else if ("-c".equals(s)) {
+					i++;
+					cc = Integer.parseInt(args[i]);
+				}
 			}
+			List urlv = new ArrayList();
+			{
+				int i = 0;
+				for (Object url : urls) {
+					List row = new ArrayList();
+					row.add("url" + (i++));
+					row.add(url);
+					urlv.add(row);
+				}
+			}
+
+			List sourcev = new ArrayList();
+			{
+				int i = 0;
+				for (Object url : urls) {
+					List row = new ArrayList();
+					row.add("DIRECT");
+					row.add("url" + (i++));
+					row.add("head1");
+					row.add(cc);
+					sourcev.add(row);
+				}
+			}
+
+			m = new HashMap();
+			m.put("url", urlv);
+			m.put("proxy", Collections.EMPTY_LIST);
+			m.put("source", sourcev);
+			m.put("httpHeader", PyData.parseAll(String.format("[[ head1 {\"user-agent\": \"%s\"}]]", U.DEF_AGENT)));
+
 		}
 		new DL2().run(m);
 	}
 
 	private static void usage() {
-		System.out.println("Usage: dl2 <dl2conf> OR dl2 -u <url>");
+		System.out.println("Usage: dl2 <dl2conf> OR dl2 -u <url> -u <url2..> -c <concurrent number>");
 
 	}
 
