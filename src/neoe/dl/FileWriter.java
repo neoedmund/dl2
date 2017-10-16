@@ -21,7 +21,6 @@ public class FileWriter {
 				while (true) {
 					try {
 						// Log.log("FileWriter check");
-						queue.size();
 						if (!queue.isEmpty()) {
 							// Log.log("[D]FileWriter has data");
 							List<Object[]> buf = new ArrayList<>();
@@ -88,11 +87,11 @@ public class FileWriter {
 	// }
 	// }
 
-	public void add(long pi, byte[] ba, long len) {
+	public void add(long pi, byte[] ba, long len) throws InterruptedException {
 		if (len != ba.length) {
 			U.bug();
 		}
-		queue.add(new Object[] { pi, ba, len });
+		queue.put(new Object[] { pi, ba, len });
 	}
 
 	private LinkedBlockingQueue<Object[]> queue = new LinkedBlockingQueue<Object[]>(5000);
