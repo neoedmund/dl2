@@ -7,7 +7,7 @@ import neoe.util.Log;
 
 public class U {
 
-	public static final String DEF_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:56.0) Gecko/20100101 Firefox/56.0"
+	public static final String DEF_AGENT = "Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:60.0) Gecko/20100101 Firefox/60.0"
 			.toString();
 
 	interface Func {

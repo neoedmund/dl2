@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +18,7 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "10h16".toString();
+	static final String ver = "4i25".toString();
 
 	boolean console = true;
 
@@ -38,6 +37,7 @@ public class DL2 {
 			m = (Map) PyData.parseAll(FileUtil.readString(new FileInputStream(confn), null), false);
 		} else {
 			List urls = new ArrayList();
+			List<String> proxys = new ArrayList();
 			int cc = 4;
 			for (int i = 0; i < args.length; i++) {
 				String s = args[i];
@@ -48,6 +48,9 @@ public class DL2 {
 				} else if ("-c".equals(s)) {
 					i++;
 					cc = Integer.parseInt(args[i]);
+				} else if ("-p".equals(s)) {
+					i++;
+					proxys.add(args[i]);
 				}
 			}
 			List urlv = new ArrayList();
@@ -60,13 +63,21 @@ public class DL2 {
 					urlv.add(row);
 				}
 			}
+			proxys.add("DIRECT");
+			List proxyValue = new ArrayList();
 
 			List sourcev = new ArrayList();
-			{
+			for (String proxy : proxys) {
+				{
+					Map pm = new HashMap();
+					pm.put("name", proxy);
+					pm.put("url", proxy);
+					proxyValue.add(pm);
+				}
 				int i = 0;
 				for (Object url : urls) {
 					List row = new ArrayList();
-					row.add("DIRECT");
+					row.add(proxy);
 					row.add("url" + (i++));
 					row.add("head1");
 					row.add(cc);
@@ -76,7 +87,7 @@ public class DL2 {
 
 			m = new HashMap();
 			m.put("url", urlv);
-			m.put("proxy", Collections.EMPTY_LIST);
+			m.put("proxy", proxyValue);
 			m.put("source", sourcev);
 			m.put("httpHeader", PyData.parseAll(String.format("[[ head1 {\"user-agent\": \"%s\"}]]", U.DEF_AGENT)));
 
@@ -85,8 +96,7 @@ public class DL2 {
 	}
 
 	private static void usage() {
-		System.out.println("Usage: dl2 <dl2conf> OR dl2 -u <url> -u <url2..> -c <concurrent number>");
-
+		System.out.println("Usage: dl2 <dl2conf> OR dl2 -u <url> -u <url2..> -c <concurrent number>  -p proxy-host:port");
 	}
 
 	private int agentCnt;
