@@ -71,7 +71,7 @@ public class FileWriter {
 			// Log.log("write "+start);
 		}
 		f.close();
-		ps.save("FileWriter " + buf.size());// + " t=" + Thread.currentThread().getId());
+		ps.save(dl2);// + " t=" + Thread.currentThread().getId());
 	}
 
 	private static void writeToFile(RandomAccessFile f, long start, long len, byte[] ba) throws Exception {

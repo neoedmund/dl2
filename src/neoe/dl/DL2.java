@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import neoe.util.Est;
 import neoe.util.FileUtil;
 import neoe.util.Log;
 import neoe.util.PyData;
@@ -21,6 +22,8 @@ public class DL2 {
 	static final String ver = "4i25".toString();
 
 	boolean console = true;
+	
+	Est est;
 
 	public static void main(String[] args) throws Exception {
 		Log.log("DL2 " + ver);
@@ -188,10 +191,10 @@ public class DL2 {
 			if (!doResumeDownloadParts()) {
 				fn = fn + "." + U.ts36();
 				doDownloadInit();
-			} else {
+			} else {				
 				Log.log("resume");
 			}
-		} else {
+		} else {			
 			doDownloadInit();
 		}
 		fw = new FileWriter(this);
@@ -199,6 +202,7 @@ public class DL2 {
 		{
 			long done = ps.getDone();
 			Log.log(String.format("Start %s parts, done: %.1f%%", ps.parts.size(), 100.0f * done / blocks));
+			est=new Est(done);
 		}
 
 		List<Thread> agentThreads = startAgents();
