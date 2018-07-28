@@ -19,7 +19,7 @@ public class Est {
 		float h3 = h * (cnt - start) / p;
 		float h2 = h * (cnt - i) / p;
 		String unit = "H";
-		if (h < 1) {
+		if (h2 < 1) {
 			h *= 60;
 			h2 *= 60;
 			h3 *= 60;
