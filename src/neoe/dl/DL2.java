@@ -19,7 +19,7 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "7i28".toString();
+	static final String ver = "8i4".toString();
 
 	boolean console = true;
 	
@@ -273,6 +273,7 @@ public class DL2 {
 				};
 				t.start();
 				agentThreads.add(t);
+				U.sleep(800);// no sudden access
 			}
 		}
 		this.agentCnt = cnt;
