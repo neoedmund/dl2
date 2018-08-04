@@ -102,7 +102,7 @@ public class DL2 {
 		System.out.println("Usage: dl2 <dl2conf> OR dl2 -u <url> -u <url2..> -c <concurrent number>  -p proxy-host:port");
 	}
 
-	private int agentCnt;
+	int agentCnt;
 	int agentDown;
 	private long blocks;
 	Conf conf = new Conf();
@@ -273,7 +273,7 @@ public class DL2 {
 				};
 				t.start();
 				agentThreads.add(t);
-				U.sleep(800);// no sudden access
+				U.sleep(500);// no sudden access
 			}
 		}
 		this.agentCnt = cnt;

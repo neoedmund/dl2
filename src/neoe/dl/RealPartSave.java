@@ -21,7 +21,7 @@ public class RealPartSave {
 	long st0;
 	long st1;
 	public long sum;
-	long sum0;
+	long sum0, sum1;
 
 	public RealPartSave() {
 		this.st0 = this.st1 = System.currentTimeMillis();
@@ -64,12 +64,18 @@ public class RealPartSave {
 		f1.delete();
 		f2.renameTo(f1);
 		{
-			long speed = 0;
-			long t1 = System.currentTimeMillis() - st0;
+			long now = System.currentTimeMillis();
+			long speed = 0, speed2 = 0;
+			long t1 = now - st0;
 			if (t1 != 0)
 				speed = (sum - sum0) * DL2.blockSize / t1;
-			System.out.println(String.format("parts %d/%d %s\t%,d KB/s",  sum, blocks,
-					dl2.est.getInfo(sum, blocks), speed));
+			long t2 = now - st1;
+			if (t2 != 0)
+				speed2 = (sum - sum1) * DL2.blockSize / t2;
+			sum1 = sum;
+			st1 = now;
+			System.out.print(String.format("[%d]%d/%d %s %dKB/s %dKB/s    \r", dl2.agentCnt - dl2.agentDown, sum, blocks,
+					dl2.est.getInfo(sum, blocks), speed, speed2));
 
 		}
 	}

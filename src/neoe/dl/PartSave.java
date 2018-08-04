@@ -125,6 +125,7 @@ class PartSave {
 				n.parts.add(p.dup());
 				sum += p.doneLen;
 			}
+			n.sum1 = sum;
 			n.sum0 = sum;
 			n.sum = sum;
 		}

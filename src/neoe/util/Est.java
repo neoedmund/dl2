@@ -25,7 +25,7 @@ public class Est {
 			h3 *= 60;
 			unit = "M";
 		}
-		String s = String.format("=%.1f%s+%.1f%s|%.1f%s %.1f%%", h, unit, h2, unit, h3, unit,
+		String s = String.format("\u23F2%.1f%s\u231B%.1f%s=%.1f%s %.1f%%", h, unit, h2, unit, h3, unit,
 				((float) i / cnt * 100));
 		return s;
 	}

@@ -62,7 +62,8 @@ public class Downloader {
 			if (p1 >= 0)
 				return Long.parseLong(s1.substring(p1 + 1));
 		}
-		Log.log(String.format("Maybe no support for ranged download, %s, respHeader=%s", reqHeader.get("Range"), respHeader));
+		Log.log(String.format("Maybe no support for ranged download, %s, respHeader=%s", reqHeader.get("Range"),
+				respHeader));
 		return null;
 	}
 
@@ -154,7 +155,7 @@ public class Downloader {
 				if (errorString.indexOf("connect timed out") >= 0) {
 					throw new DL2Exception("connect timed out");
 				}
-				throw new RuntimeException("download fail via proxy:" + proxy, ex1);
+				throw new DL2Exception("download fail via proxy:" + proxy + " by:" + ex1);
 			} else {
 				return;
 			}
