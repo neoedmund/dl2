@@ -22,7 +22,7 @@ public class DL2 {
 	static final String ver = "8i4".toString();
 
 	boolean console = true;
-	
+
 	Est est;
 
 	public static void main(String[] args) throws Exception {
@@ -39,6 +39,7 @@ public class DL2 {
 			String confn = args[0];
 			m = (Map) PyData.parseAll(FileUtil.readString(new FileInputStream(confn), null), false);
 		} else {
+			m = new HashMap();
 			List urls = new ArrayList();
 			List<String> proxys = new ArrayList();
 			int cc = 4;
@@ -54,6 +55,9 @@ public class DL2 {
 				} else if ("-p".equals(s)) {
 					i++;
 					proxys.add(args[i]);
+				} else if ("-f".equals(s)) {
+					i++;
+					m.put("failcnt", args[i]);
 				}
 			}
 			List urlv = new ArrayList();
@@ -88,7 +92,6 @@ public class DL2 {
 				}
 			}
 
-			m = new HashMap();
 			m.put("url", urlv);
 			m.put("proxy", proxyValue);
 			m.put("source", sourcev);
@@ -99,7 +102,8 @@ public class DL2 {
 	}
 
 	private static void usage() {
-		System.out.println("Usage: dl2 <dl2conf> OR dl2 -u <url> -u <url2..> -c <concurrent number>  -p proxy-host:port");
+		System.out
+				.println("Usage: dl2 <dl2conf> OR dl2 -u <url> -u <url2..> -c <concurrent number>  -p proxy-host:port");
 	}
 
 	int agentCnt;
@@ -191,10 +195,10 @@ public class DL2 {
 			if (!doResumeDownloadParts()) {
 				fn = fn + "." + U.ts36();
 				doDownloadInit();
-			} else {				
+			} else {
 				Log.log("resume");
 			}
-		} else {			
+		} else {
 			doDownloadInit();
 		}
 		fw = new FileWriter(this);
@@ -202,7 +206,7 @@ public class DL2 {
 		{
 			long done = ps.getDone();
 			Log.log(String.format("Start %s parts, done: %.1f%%", ps.parts.size(), 100.0f * done / blocks));
-			est=new Est(done);
+			est = new Est(done);
 		}
 
 		List<Thread> agentThreads = startAgents();
