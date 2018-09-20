@@ -1,13 +1,14 @@
 package neoe.dl;
 
+import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
 import neoe.util.Log;
+import neoe.util.TempFile123;
 
 class PartSave {
 
@@ -75,10 +76,10 @@ class PartSave {
 	}
 
 	public boolean load(String psFile, long filesize) throws IOException {
-
+		TempFile123 tmpfile = new TempFile123(psFile);
+		byte[] bs = tmpfile.get();
 		this.filesize = filesize;
-		FileInputStream fi;
-		DataInputStream in = new DataInputStream(fi = new FileInputStream(psFile));
+		DataInputStream in = new DataInputStream(new ByteArrayInputStream(bs));
 		{
 			int i = in.readInt();
 			if (i != DL2.ps_version) {
@@ -106,7 +107,6 @@ class PartSave {
 			parts.add(p);
 		}
 		in.close();
-		fi.close();
 		lastDone = getDone();
 		return true;
 

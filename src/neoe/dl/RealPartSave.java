@@ -1,5 +1,6 @@
 package neoe.dl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -7,6 +8,7 @@ import java.io.IOException;
 import java.util.List;
 
 import neoe.util.Log;
+import neoe.util.TempFile123;
 
 public class RealPartSave {
 	public boolean allFinished;
@@ -22,6 +24,7 @@ public class RealPartSave {
 	long st1;
 	public long sum;
 	long sum0, sum1;
+	TempFile123 tempfile;
 
 	public RealPartSave() {
 		this.st0 = this.st1 = System.currentTimeMillis();
@@ -43,9 +46,8 @@ public class RealPartSave {
 	}
 
 	void save(DL2 dl2) throws IOException {
-		String tmpf = fnps + "." + U.ts36();
-		FileOutputStream fo;
-		DataOutputStream out = new DataOutputStream(fo = new FileOutputStream(tmpf));
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		DataOutputStream out = new DataOutputStream(baos);
 		out.writeInt(DL2.ps_version);
 		out.writeInt(DL2.blockSize);
 		out.writeLong(filesize);
@@ -58,11 +60,10 @@ public class RealPartSave {
 			sum += p.doneLen;
 		}
 		out.close();
-		fo.close();
-		File f1 = new File(fnps);
-		File f2 = new File(tmpf);
-		f1.delete();
-		f2.renameTo(f1);
+		if (tempfile == null) {
+			tempfile = new TempFile123(fnps);
+		}
+		tempfile.save(baos.toByteArray());
 		{
 			long now = System.currentTimeMillis();
 			long speed = 0, speed2 = 0;
@@ -74,8 +75,8 @@ public class RealPartSave {
 				speed2 = (sum - sum1) * DL2.blockSize / t2;
 			sum1 = sum;
 			st1 = now;
-			System.out.print(String.format("[%d]%d/%d %s %dKB/s %dKB/s    \r", dl2.agentCnt - dl2.agentDown, sum, blocks,
-					dl2.est.getInfo(sum, blocks), speed, speed2));
+			System.out.print(String.format("[%d]%d/%d %s %dKB/s %dKB/s    \r", dl2.agentCnt - dl2.agentDown, sum,
+					blocks, dl2.est.getInfo(sum, blocks), speed, speed2));
 
 		}
 	}
