@@ -194,7 +194,11 @@ public class Downloader {
 		if (src.proxy != null) {
 			useProxy = true;
 			String[] ss = src.proxy.url.split(":");
-			proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ss[0], Integer.parseInt(ss[1])));
+			if (ss[0].equals("socks")) {
+				proxy = new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(ss[1], Integer.parseInt(ss[2])));
+			} else {
+				proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ss[0], Integer.parseInt(ss[1])));
+			}
 			// if (src.proxy.user != null) {
 			// reqHeader.put("Proxy-Authorization", "Basic " +
 			// Base64.encodeBytes(src.proxy.user.getBytes()));
