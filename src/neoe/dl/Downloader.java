@@ -23,7 +23,7 @@ public class Downloader {
 
 	public byte[] ba;
 
-	String enc = "UTF8";
+	public String enc = "UTF8";
 
 	private long len;
 
@@ -87,10 +87,10 @@ public class Downloader {
 			URL u = new URL(url);
 			URLConnection conn;
 			if (useProxy) {
-				// Log.log(String.format("[D]connect via proxy", url, proxy));
+//				 Log.log(String.format("[D]connect via proxy %s %s", url, proxy));
 				conn = u.openConnection(proxy);
 			} else {
-				// Log.log(String.format("[D]connect"));
+//				 Log.log(String.format("[D]connect"));
 				conn = u.openConnection();
 			}
 			conn.setConnectTimeout(9000);
@@ -116,8 +116,8 @@ public class Downloader {
 						return;
 					}
 				}
-				// Log.log(String.format("[DD %s|%s]respHeader=%s", name,
-				// reqHeader.get("Range"), respHeader));
+//				 Log.log(String.format("[DD %s|%s]respHeader=%s", name,
+//				 reqHeader.get("Range"), respHeader));
 				if (readContent) {
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					FileUtil.copy(conn.getInputStream(), baos);
@@ -126,7 +126,7 @@ public class Downloader {
 					{// gzip enc
 						Object encoding = respHeader.get("Content-Encoding"); // java.util.Collections$UnmodifiableRandomAccessList
 						Object te = respHeader.get("Transfer-Encoding");
-						// Log.log("encoding="+encoding);
+//						 Log.log("encoding="+encoding);
 						if (encoding != null && encoding.toString().toLowerCase().indexOf("gzip") >= 0) {
 							// gzipped
 							GZIPInputStream gzip = new GZIPInputStream(new ByteArrayInputStream(ba));
@@ -134,13 +134,13 @@ public class Downloader {
 							FileUtil.copy(gzip, baos2);
 							ba = baos2.toByteArray();
 							int len2 = ba.length;
-							Log.log(String.format("[D]extract gzip %d bytes -> %d bytes", len1, len2));
+//							Log.log(String.format("[D]extract gzip %d bytes -> %d bytes", len1, len2));
 						}
 
 					}
 
-					// Log.log(String.format("[D]downloaded %s(%d bytes)", url,
-					// ba.length));
+//					 Log.log(String.format("[D]downloaded %s(%d bytes)", url,
+//					 ba.length));
 				}
 			} catch (Exception ex) {
 				error = true;
@@ -155,6 +155,7 @@ public class Downloader {
 				if (errorString.indexOf("connect timed out") >= 0) {
 					throw new DL2Exception("connect timed out");
 				}
+//				ex1.printStackTrace();
 				throw new DL2Exception("download fail via proxy:" + proxy + " by:" + ex1);
 			} else {
 				return;
@@ -182,7 +183,7 @@ public class Downloader {
 	}
 
 	public void setConfig(Source1 src) {
-
+		this.src = src;
 		reqHeader = new HashMap();
 
 		// header
