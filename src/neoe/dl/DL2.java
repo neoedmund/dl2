@@ -19,7 +19,7 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "3j18".toString();
+	static final String ver = "9j2".toString();
 
 	boolean console = true;
 
@@ -55,6 +55,8 @@ public class DL2 {
 				} else if ("-p".equals(s)) {
 					i++;
 					proxys.add(args[i]);
+				} else if ("-p1".equals(s)) {
+					proxys.add("socks:127.0.0.1:1080");
 				} else if ("-f".equals(s)) {
 					i++;
 					m.put("failcnt", args[i]);

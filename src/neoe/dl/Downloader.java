@@ -87,7 +87,7 @@ public class Downloader {
 			URL u = new URL(url);
 			URLConnection conn;
 			if (useProxy) {
-//				 Log.log(String.format("[D]connect via proxy %s %s", url, proxy));
+				 Log.log(String.format("[D]connect via proxy %s %s", url, proxy));
 				conn = u.openConnection(proxy);
 			} else {
 //				 Log.log(String.format("[D]connect"));
@@ -116,8 +116,8 @@ public class Downloader {
 						return;
 					}
 				}
-//				 Log.log(String.format("[DD %s|%s]respHeader=%s", name,
-//				 reqHeader.get("Range"), respHeader));
+				 Log.log(String.format("[DD %s|%s]respHeader=%s", name,
+				 reqHeader.get("Range"), respHeader));
 				if (readContent) {
 					ByteArrayOutputStream baos = new ByteArrayOutputStream();
 					FileUtil.copy(conn.getInputStream(), baos);
