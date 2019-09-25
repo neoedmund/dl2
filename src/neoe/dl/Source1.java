@@ -35,7 +35,7 @@ public class Source1 implements Cloneable {
 		long t = t2 - t0;
 		if (t == 0)
 			return "MAX";
-		return String.format("%s %,dKB/s, %,d bytes", url, sum / t, sum);
+		return String.format("%s %,dKB/s, %,d bytes", name, sum / t, sum);
 
 	}
 

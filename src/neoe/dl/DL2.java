@@ -240,7 +240,7 @@ public class DL2 {
 			else
 				Log.log(String.format("total speed:%,d KB/s, %,d bytes in %,d sec", ps.sum / t, ps.sum, t / 1000));
 			for (DLAgent a : agents) {
-				Log.log("|-" + a.src.getSpeed() + " " + a.src.name);
+				Log.log("|-" + a.src.getSpeed());
 			}
 		}
 		{// stop slow agents
