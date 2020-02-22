@@ -19,7 +19,7 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "9j2".toString();
+	static final String ver = "2k22".toString();
 
 	boolean console = true;
 
