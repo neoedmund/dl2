@@ -2,7 +2,7 @@ package neoe.dl;
 
 import java.io.IOException;
 
-import neoe.util.Log;
+import neoe.dl.util.Log;
 
 public class DLAgent {
 	private static final boolean DONNT_SEP_SAME_SOURCE = false;
@@ -36,7 +36,7 @@ public class DLAgent {
 		if (ps.dl2.remain != 0 && pi == ps.blocks - 1) {
 			len = ps.dl2.remain;// ps.filesize % DL2.blockSize;
 		}
-		Downloader dl = new Downloader(name);
+		Downloader dl = new Downloader(name,ps.dl2);
 		dl.download(src, start, len, true);
 		// write
 
@@ -78,7 +78,9 @@ public class DLAgent {
 		say("start " + part);
 		try {
 			while (true) { // on total
+				ps.dl2.checkCancel();
 				while (true) { // on part
+					ps.dl2.checkCancel();
 					if (part == null)
 						break;
 					long pi = part.getNext();

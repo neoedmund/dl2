@@ -1,6 +1,6 @@
 // ver1.2 can parse string with double quote like 'neo''s home'
 // ver151223, parse LISP-alike(separated by only space, no comma)
-package neoe.util;
+package neoe.dl.util;
 
 import java.io.File;
 import java.io.FileInputStream;

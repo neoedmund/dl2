@@ -1,5 +1,6 @@
 package neoe.dl;
 
+import java.io.File;
 import java.net.Authenticator;
 import java.net.PasswordAuthentication;
 import java.util.ArrayList;
@@ -7,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import neoe.util.Log;
+import neoe.dl.util.Log;
 
 class Conf {
 
@@ -20,9 +21,20 @@ class Conf {
 	Map<String, String> urls = new HashMap();
 
 	int failCnt;
+	String workingDir = ".";
 
 	public void init(Map m) {
 		Log.log("[d]load config:" + m);
+		{
+			String dir = (String) m.get("destDir");
+			if (dir != null) {
+				workingDir = dir;
+				new File(dir).mkdirs();
+				if (!new File(dir).isDirectory()) {
+					U.error("fail to create dir:" + dir);
+				}
+			}
+		}
 		loadProxy((List) m.get("proxy"));
 		loadHeader((List) m.get("httpHeader"));
 		loadUrl((List) m.get("url"));

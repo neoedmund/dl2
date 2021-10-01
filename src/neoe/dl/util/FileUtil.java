@@ -1,4 +1,4 @@
-package neoe.util;
+package neoe.dl.util;
 
 import java.io.BufferedOutputStream;
 import java.io.BufferedReader;

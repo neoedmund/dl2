@@ -3,24 +3,23 @@ package neoe.dl;
 import java.io.File;
 import java.util.List;
 
-import neoe.util.Log;
+import neoe.dl.util.Log;
 
 public class U {
-
-	public static final String DEF_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:73.0) Gecko/20100101 Firefox/73.0"
+	public static final String DEF_AGENT = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:81.0) Gecko/20100101 Firefox/81.0"
 			.toString();
 
 	interface Func {
 		Object func(Object o) throws Exception;
 	}
 
-	static long checkFileSize(List<Source1> source) throws Exception {
+	static long checkFileSize(List<Source1> source, DL2 dl2) throws Exception {
 		Object o = threadAny(source, new Func() {
 
 			@Override
 			public Object func(Object o) throws Exception {
 				Source1 src = ((Source1) o).clone();
-				Downloader dl = new Downloader(src.name);
+				Downloader dl = new Downloader(src.name, dl2);
 				dl.download(src, 0, 1, false);// get 1 bytes
 				// System.out.println("content:"+new String(dl.ba));
 				return dl.getFileLength();
@@ -51,26 +50,27 @@ public class U {
 			fn = "dl_" + Long.toString(System.currentTimeMillis(), 36);
 			Log.log("[W]cannot get filename from url use:" + fn);
 		}
-		if (new File(fn).exists()) {
+		String dir = dl2.conf.workingDir;
+		if (new File(dir, fn).exists()) {
 			throw new RuntimeException("file already exists:" + fn);
 		}
 		{
 			fn = fn + DOWNLOADING;
 		}
 		while (true) {
-			if (new File(fn).exists()) {
+			if (new File(dir, fn).exists()) {
 				String fnps = U.getPsFile(fn);
-				if (new File(fnps).exists()) {
+				if (new File(dir, fnps).exists()) {
 					Log.log("find part file to resume:" + fn);
 					dl2.resume = true;
-					return fn;
+					return new File(dir, fn).getAbsolutePath();
 				} else {
 					// retry
 					fn = fn + "_" + Long.toString(System.currentTimeMillis(), 36);
 				}
 			} else {
 				Log.log("download to " + fn);
-				return fn;
+				return new File(dir, fn).getAbsolutePath();
 			}
 		}
 	}

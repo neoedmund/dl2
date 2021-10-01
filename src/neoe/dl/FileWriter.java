@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import neoe.util.Log;
+import neoe.dl.util.Log;
 
 public class FileWriter {
 	private DL2 dl2;
@@ -45,9 +45,7 @@ public class FileWriter {
 					}
 				}
 				Log.log("FileWriter finished.");
-				synchronized (dl2) {
-					dl2.notifyAll();
-				}
+				dl2.done=true;
 			}
 		}.start();
 	}

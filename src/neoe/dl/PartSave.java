@@ -7,8 +7,8 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
-import neoe.util.Log;
-import neoe.util.TempFile123;
+import neoe.dl.util.Log;
+import neoe.dl.util.TempFile123;
 
 class PartSave {
 

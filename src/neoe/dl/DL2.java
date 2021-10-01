@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import neoe.util.Est;
-import neoe.util.FileUtil;
-import neoe.util.Log;
-import neoe.util.PyData;
+import neoe.dl.util.Est;
+import neoe.dl.util.FileUtil;
+import neoe.dl.util.Log;
+import neoe.dl.util.PyData;
 
 public class DL2 {
 
@@ -19,9 +19,9 @@ public class DL2 {
 
 	static final int ps_version = 2;
 
-	static final String ver = "2k22".toString();
+	static final String ver = "9A".toString();
 
-	boolean console = true;
+	public boolean console = true;
 
 	Est est;
 
@@ -97,7 +97,7 @@ public class DL2 {
 			m.put("url", urlv);
 			m.put("proxy", proxyValue);
 			m.put("source", sourcev);
-			m.put("httpHeader", PyData.parseAll(String.format("[[ head1 {\"user-agent\": \"%s\"}]]", U.DEF_AGENT)));
+			m.put("httpHeader", PyData.parseAll(String.format("[[ head1 {\"User-Agent\": \"%s\"}]]", U.DEF_AGENT)));
 
 		}
 		new DL2().run(m);
@@ -178,18 +178,18 @@ public class DL2 {
 
 	}
 
-	public void run(Map m) throws Exception {
+	public int run(Map m) throws Exception {
 		conf.init(m);
 		if (conf.source.isEmpty()) {
 			System.err.println("nothing to download, exit");
-			return;
+			return -1;
 		}
 
-		filesize = U.checkFileSize(conf.source);
+		filesize = U.checkFileSize(conf.source, this);
 
 		if (filesize <= 0) {
 			Log.log("exit because filesize=" + filesize);
-			return;
+			return -2;
 		}
 		fn = U.getFileName(conf.source.get(0).url, filesize, this);
 
@@ -212,8 +212,9 @@ public class DL2 {
 		}
 
 		List<Thread> agentThreads = startAgents();
-		synchronized (this) {
-			this.wait();
+		while (!done) {
+			fw.ps.getDone();
+			U.sleep(10);
 		}
 
 		{ // renanme file
@@ -259,9 +260,14 @@ public class DL2 {
 				}
 			}
 		}
+		return 0;
 	}
 
 	List<DLAgent> agents = new ArrayList<>();
+
+	public boolean cancel = false;
+
+	protected boolean done;
 
 	private List<Thread> startAgents() {
 		Log.log("start agents");
@@ -284,6 +290,57 @@ public class DL2 {
 		}
 		this.agentCnt = cnt;
 		return agentThreads;
+	}
+
+	public void checkCancel() {
+		if (cancel) {
+			throw new RuntimeException("DL2 cancelled");
+		}
+	}
+
+	public static Map getSimpleConf(String url0, String destDir) throws Exception {
+		Map m = new HashMap();
+		List urls = new ArrayList();
+		urls.add(url0);
+		List<String> proxys = new ArrayList();
+		int cc = 4;
+		List urlv = new ArrayList();
+		{
+			int i = 0;
+			for (Object url : urls) {
+				List row = new ArrayList();
+				row.add("url" + (i++));
+				row.add(url);
+				urlv.add(row);
+			}
+		}
+		proxys.add("DIRECT");
+		List proxyValue = new ArrayList();
+		List sourcev = new ArrayList();
+		for (String proxy : proxys) {
+			{
+				Map pm = new HashMap();
+				pm.put("name", proxy);
+				pm.put("url", proxy);
+				proxyValue.add(pm);
+			}
+			int i = 0;
+			for (Object url : urls) {
+				List row = new ArrayList();
+				row.add(proxy);
+				row.add("url" + (i++));
+				row.add("head1");
+				row.add(cc);
+				sourcev.add(row);
+			}
+		}
+
+		m.put("url", urlv);
+		m.put("proxy", proxyValue);
+		m.put("source", sourcev);
+		m.put("httpHeader", PyData.parseAll(String.format("[[ head1 {\"User-Agent\": \"%s\"}]]", U.DEF_AGENT)));
+		m.put("destDir", destDir);
+		return m;
 	}
 
 }

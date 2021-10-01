@@ -3,12 +3,11 @@ package neoe.dl;
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
-import neoe.util.Log;
-import neoe.util.TempFile123;
+import neoe.dl.util.Log;
+import neoe.dl.util.TempFile123;
 
 public class RealPartSave {
 	public boolean allFinished;

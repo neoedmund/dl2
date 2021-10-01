@@ -1,6 +1,6 @@
 package neoe.dl;
 
-import neoe.util.Log;
+import neoe.dl.util.Log;
 
 class Part /* implements Comparable<Part> */ {
 	DLAgent agent;

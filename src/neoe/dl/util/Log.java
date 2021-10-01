@@ -1,5 +1,5 @@
 //neoe(c)
-package neoe.util;
+package neoe.dl.util;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -83,7 +83,7 @@ public class Log {
 			}
 			out.flush();
 			int p1 = s0.indexOf('[');
-			if (stdout || p1 != 0)
+			if (stdout && p1 != 0)
 				System.out.print(sb.toString());
 		} catch (Exception ex) {
 			ex.printStackTrace();

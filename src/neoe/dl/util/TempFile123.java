@@ -1,4 +1,4 @@
-package neoe.util;
+package neoe.dl.util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

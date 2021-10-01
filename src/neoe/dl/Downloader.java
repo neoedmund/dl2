@@ -11,8 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.zip.GZIPInputStream;
 
-import neoe.util.FileUtil;
-import neoe.util.Log;
+import neoe.dl.util.FileUtil;
+import neoe.dl.util.Log;
 
 /** */
 public class Downloader {
@@ -41,7 +41,10 @@ public class Downloader {
 
 	private Source1 src;
 
-	public Downloader(String name) {
+	private DL2 dl2;
+
+	public Downloader(String name, DL2 dl2) {
+		this.dl2=dl2;
 		this.name = name;
 	}
 
@@ -79,6 +82,7 @@ public class Downloader {
 		ba = emptyBA;
 		retry = 0;
 		while (true) {
+			dl2.checkCancel();
 			retry += 1;
 			// safeguard
 			if (retry > MAX_RETRY)
