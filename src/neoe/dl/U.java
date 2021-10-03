@@ -34,6 +34,14 @@ public class U {
 	public static final String DOWNLOADING = ".dling";
 
 	static String getFileName(String s, long filesize, DL2 dl2) {
+		if (dl2.conf.destFile != null) {
+			String fn = dl2.conf.destFile;
+			if (new File(fn).exists()) {
+				throw new RuntimeException("file already exists:" + fn);
+			}
+			return fn;
+		}
+
 		String fn = null;
 		int p = s.lastIndexOf("/");
 		if (p >= 0) {

@@ -23,6 +23,8 @@ class Conf {
 	int failCnt;
 	String workingDir = ".";
 
+	String destFile;
+
 	public void init(Map m) {
 		Log.log("[d]load config:" + m);
 		{
@@ -32,6 +34,16 @@ class Conf {
 				new File(dir).mkdirs();
 				if (!new File(dir).isDirectory()) {
 					U.error("fail to create dir:" + dir);
+				}
+			}
+		}
+		{
+			String file = (String) m.get("destFile");
+			if (file != null) {
+				destFile = file;
+				new File(file).getParentFile().mkdirs();
+				if (!new File(file).getParentFile().isDirectory()) {
+					U.error("fail to create dir for:" + file);
 				}
 			}
 		}

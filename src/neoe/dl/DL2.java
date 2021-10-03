@@ -342,5 +342,49 @@ public class DL2 {
 		m.put("destDir", destDir);
 		return m;
 	}
+	public static Map getSimpleConf2(String url0, String destFile) throws Exception {
+		Map m = new HashMap();
+		List urls = new ArrayList();
+		urls.add(url0);
+		List<String> proxys = new ArrayList();
+		int cc = 4;
+		List urlv = new ArrayList();
+		{
+			int i = 0;
+			for (Object url : urls) {
+				List row = new ArrayList();
+				row.add("url" + (i++));
+				row.add(url);
+				urlv.add(row);
+			}
+		}
+		proxys.add("DIRECT");
+		List proxyValue = new ArrayList();
+		List sourcev = new ArrayList();
+		for (String proxy : proxys) {
+			{
+				Map pm = new HashMap();
+				pm.put("name", proxy);
+				pm.put("url", proxy);
+				proxyValue.add(pm);
+			}
+			int i = 0;
+			for (Object url : urls) {
+				List row = new ArrayList();
+				row.add(proxy);
+				row.add("url" + (i++));
+				row.add("head1");
+				row.add(cc);
+				sourcev.add(row);
+			}
+		}
+
+		m.put("url", urlv);
+		m.put("proxy", proxyValue);
+		m.put("source", sourcev);
+		m.put("httpHeader", PyData.parseAll(String.format("[[ head1 {\"User-Agent\": \"%s\"}]]", U.DEF_AGENT)));
+		m.put("destFile", destFile);
+		return m;
+	}
 
 }
